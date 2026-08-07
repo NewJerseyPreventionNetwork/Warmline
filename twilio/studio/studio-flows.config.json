@@ -10,7 +10,13 @@
     }
   ],
   "replaceWidgetTypes": [
-    "run-function",
-    "set-variables"
+    "run-function"
+  ],
+  "functionServices": [
+    {
+      "name": "njpn-api",
+      "environmentSuffix": 0,
+      "pattern": false
+    }
   ]
 }

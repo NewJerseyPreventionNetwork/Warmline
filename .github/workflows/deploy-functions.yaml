@@ -1,1 +1,33 @@
-# TODO: Write a pipeline for deploying a functions service - see action-helpers
+name: Deploy Functions
+run-name: Deploy Functions to ${{ inputs.ENVIRONMENT }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      ENVIRONMENT:
+        description: Environment to deploy to
+        default: Develop
+        type: choice
+        options:
+          - Develop
+          - UAT
+          - Production
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  deploy_functions:
+    if: inputs.ENVIRONMENT == 'Develop' || inputs.ENVIRONMENT == 'UAT' || github.triggering_actor == 'zing-devops'
+
+    uses: zingdevlimited/actions-helpers/.github/workflows/deploy-twilio-functions.yaml@v4
+
+    with:
+      SERVICE_DIRECTORY: twilio/functions
+      BUILD_WORKFLOW_NAME: build-functions.yaml
+      TWILIO_ACCOUNT_SID: ${{ vars[format('{0}_TWILIO_ACCOUNT_SID', inputs.ENVIRONMENT)] }}
+      TWILIO_API_KEY: ${{ vars[format('{0}_TWILIO_API_KEY', inputs.ENVIRONMENT)] }}
+
+    secrets:
+      TWILIO_API_SECRET: ${{ secrets[format('{0}_TWILIO_API_SECRET', inputs.ENVIRONMENT)] }}
