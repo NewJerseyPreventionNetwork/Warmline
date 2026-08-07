@@ -8,7 +8,7 @@
     "build": "node ./bundle-code.mjs",
     "build:ci": "tsc --noEmit && node ./bundle-code.mjs",
     "deploy": "yarn build:ci && twilio-run deploy",
-    "deploy-prod": "yarn build:ci && twilio-run deploy --verbose -l debug --production "
+    "deploy-prod": "yarn build:ci && twilio-run deploy --verbose -l debug --production"
   },
   "dependencies": {
     "@twilio/runtime-handler": "2.0.1",
