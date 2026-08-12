@@ -1,0 +1,10 @@
+{
+  "extends": "@zingdev/serverless-helpers/tsconfig/serverlessStandard.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src"
+  },
+  "include": [
+    "src/functions/**/*.ts"
+  ]
+}

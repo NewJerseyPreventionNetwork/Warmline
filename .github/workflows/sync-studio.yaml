@@ -1,1 +1,31 @@
-# TODO: Write a pipeline for syncing studio flows - see studio-flow-helpers
+name: Sync Studio Flows
+run-name: Sync Studio Flows from ${{ inputs.ENVIRONMENT }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      ENVIRONMENT:
+        description: Environment
+        type: choice
+        options:
+          - Develop
+          - UAT
+          - Production
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Sync Studio Flows
+        uses: zingdevlimited/studio-flow-actions/sync@v1
+        with:
+          CONFIG_PATH: twilio/studio/studio-flows.config.json
+          ADD_MISSING_DEPLOY_PROPERTIES: true
+          SAVE_DIAGRAMS_TO_PATH: docs/flow-diagrams
+          TWILIO_API_KEY: ${{ vars[format('{0}_TWILIO_API_KEY', inputs.ENVIRONMENT)] }}
+          TWILIO_API_SECRET: ${{ secrets[format('{0}_TWILIO_API_SECRET', inputs.ENVIRONMENT)] }}

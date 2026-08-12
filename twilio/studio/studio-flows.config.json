@@ -1,0 +1,22 @@
+{
+  "$schema": "https://raw.githubusercontent.com/zingdevlimited/studio-flow-actions/v1/config-schema.json",
+  "enableShellVariables": true,
+  "flows": [
+    {
+      "name": "NJPN - Main IVR",
+      "path": "twilio/studio/flows/njpn-main-ivr.json",
+      "subflow": false,
+      "allowCreate": true
+    }
+  ],
+  "replaceWidgetTypes": [
+    "run-function"
+  ],
+  "functionServices": [
+    {
+      "name": "njpn-api",
+      "environmentSuffix": 0,
+      "pattern": false
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+name: Build Functions
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_functions:
+    uses: zingdevlimited/actions-helpers/.github/workflows/build-twilio-functions.yaml@v4
+    with:
+      SERVICE_DIRECTORY: twilio/functions
+      INSTALL_DIRECTORY: twilio/functions
+      BUILD_COMMAND: yarn build
+      INCLUDE_VERSION_ASSET: true
