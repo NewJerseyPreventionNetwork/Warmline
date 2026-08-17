@@ -1155,7 +1155,7 @@
           "name": "lookup_county_from_digit_spanish",
           "properties": {
             "add_twilio_auth": false,
-            "body": "https://njpn-7517.twil.io/county_mapping",
+            "body": "{{flow.variables.API_BASE_URL}}/county_mapping",
             "content_type": "application/x-www-form-urlencoded;charset=utf-8",
             "method": "GET",
             "offset": {
