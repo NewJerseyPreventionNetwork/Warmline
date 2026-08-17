@@ -8,15 +8,5 @@
       "subflow": false,
       "allowCreate": true
     }
-  ],
-  "replaceWidgetTypes": [
-    "run-function"
-  ],
-  "functionServices": [
-    {
-      "name": "njpn-api",
-      "environmentSuffix": 0,
-      "pattern": false
-    }
   ]
 }
