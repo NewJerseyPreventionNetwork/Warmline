@@ -3,7 +3,7 @@
   "enableShellVariables": true,
   "flows": [
     {
-      "name": "NJPN - Main IVR",
+      "name": "NJPN IVR",
       "path": "twilio/studio/flows/njpn-main-ivr.json",
       "subflow": false,
       "allowCreate": true
