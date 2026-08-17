@@ -56,7 +56,6 @@ The integration is designed so that unanswered calls can return to Twilio rather
 The project supports separate Twilio environments:
 
 * Development
-* UAT
 * Production
 
 TO-DO: Environment specific values such as phone numbers, API URLs and other configuration should be provided through the relevant environment configuration and deployment pipeline rather than being hardcoded into the Studio Flow or Functions.
@@ -75,7 +74,7 @@ The deployment pipelines handle:
 This allows changes to the Twilio solution to be managed through source control and deployed consistently across environments.
 
 
-Changes should not normally be made directly within the UAT or Prod Twilio Console Env as this can cause the deployed configuration and the repository configuration to become out of sync.
+Changes should not normally be made directly within the Prod Twilio Console Env as this can cause the deployed configuration and the repository configuration to become out of sync.
 
 ## Technologies used for this project
 

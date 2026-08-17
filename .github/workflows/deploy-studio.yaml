@@ -10,7 +10,6 @@ on:
         type: choice
         options:
           - Develop
-          - UAT
           - Production
 
       OVERWRITE_MANUAL:
@@ -29,7 +28,7 @@ env:
 
 jobs:
   deploy_studio:
-    if: inputs.ENVIRONMENT == 'Develop' || inputs.ENVIRONMENT == 'UAT' || github.triggering_actor == 'zing-devops'
+    if: inputs.ENVIRONMENT == 'Develop' || github.triggering_actor == 'zing-devops'
     runs-on: ubuntu-24.04
 
     steps:

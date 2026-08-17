@@ -9,7 +9,6 @@ on:
         type: choice
         options:
           - Develop
-          - UAT
           - Production
 
 permissions:

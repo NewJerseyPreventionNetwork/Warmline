@@ -10,7 +10,6 @@ on:
         type: choice
         options:
           - Develop
-          - UAT
           - Production
 
 permissions:
@@ -19,7 +18,7 @@ permissions:
 
 jobs:
   deploy_functions:
-    if: inputs.ENVIRONMENT == 'Develop' || inputs.ENVIRONMENT == 'UAT' || github.triggering_actor == 'zing-devops'
+    if: inputs.ENVIRONMENT == 'Develop' || github.triggering_actor == 'zing-devops'
 
     uses: zingdevlimited/actions-helpers/.github/workflows/deploy-twilio-functions.yaml@v4
 
