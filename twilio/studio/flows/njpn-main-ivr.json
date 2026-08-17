@@ -1,1250 +1,1213 @@
 {
-    "description": "A New Flow",
-    "flags": {
-        "allow_concurrent_calls": true
-    },
-    "initial_state": "Trigger",
-    "states": [
-        {
-            "name": "Trigger",
-            "properties": {
-                "offset": {
-                    "x": 828,
-                    "y": -862
-                }
-            },
-            "transitions": [
-                {
-                    "event": "incomingMessage"
-                },
-                {
-                    "event": "incomingCall",
-                    "next": "set_variables"
-                },
-                {
-                    "event": "incomingConversationMessage"
-                },
-                {
-                    "event": "incomingRequest"
-                },
-                {
-                    "event": "incomingParent"
-                }
-            ],
-            "type": "trigger"
-        },
-        {
-            "name": "welcome_msg",
-            "properties": {
-                "language": "en-US",
-                "loop": 1,
-                "offset": {
-                    "x": 1259,
-                    "y": -322
-                },
-                "say": "Thank you for calling the New Jersey Prevention Hub Warm Line. If this is an emergency, please hang up and dial 911."
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete",
-                    "next": "say_language"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "gather_language",
-            "properties": {
-                "finish_on_key": "#",
-                "gather_language": "en",
-                "language": "es-US",
-                "loop": 1,
-                "number_of_digits": 1,
-                "offset": {
-                    "x": 1168,
-                    "y": 67
-                },
-                "say": "Para escuchar en español, pulsa el 2",
-                "speech_model": "default",
-                "speech_timeout": "5",
-                "stop_gather": false,
-                "timeout": 5
-            },
-            "transitions": [
-                {
-                    "event": "keypress",
-                    "next": "split_language"
-                },
-                {
-                    "event": "speech"
-                },
-                {
-                    "event": "timeout"
-                }
-            ],
-            "type": "gather-input-on-call"
-        },
-        {
-            "name": "gather_county",
-            "properties": {
-                "finish_on_key": "#",
-                "gather_language": "en",
-                "language": "en-US",
-                "loop": 1,
-                "offset": {
-                    "x": -322,
-                    "y": 977
-                },
-                "say": "To connect with resources near you, please say the name of your county. If you're not sure which county you're in, say \"representative.\"",
-                "speech_model": "default",
-                "speech_timeout": "5",
-                "stop_gather": false,
-                "timeout": 5
-            },
-            "transitions": [
-                {
-                    "event": "keypress"
-                },
-                {
-                    "event": "speech",
-                    "next": "validateCounty"
-                },
-                {
-                    "event": "timeout",
-                    "next": "no_input_message"
-                }
-            ],
-            "type": "gather-input-on-call"
-        },
-        {
-            "name": "split_language",
-            "properties": {
-                "input": "{{widgets.gather_language.Digits}}",
-                "offset": {
-                    "x": 817,
-                    "y": 240
-                }
-            },
-            "transitions": [
-                {
-                    "event": "noMatch"
-                },
-                {
-                    "conditions": [
-                        {
-                            "arguments": [
-                                "{{widgets.gather_language.Digits}}"
-                            ],
-                            "friendly_name": "If value equal_to 1",
-                            "type": "equal_to",
-                            "value": "1"
-                        }
-                    ],
-                    "event": "match",
-                    "next": "check_hours_english"
-                },
-                {
-                    "conditions": [
-                        {
-                            "arguments": [
-                                "{{widgets.gather_language.Digits}}"
-                            ],
-                            "friendly_name": "If value equal_to 2",
-                            "type": "equal_to",
-                            "value": "2"
-                        }
-                    ],
-                    "event": "match",
-                    "next": "check_hours_spanish"
-                }
-            ],
-            "type": "split-based-on"
-        },
-        {
-            "name": "gather_county_spanish",
-            "properties": {
-                "finish_on_key": "#",
-                "gather_language": "en-US",
-                "language": "es-US",
-                "loop": 1,
-                "offset": {
-                    "x": 1894,
-                    "y": 1043
-                },
-                "say": "Para conectarte con los recursos cercanos, por favor di el nombre de tu condado. Si no estás seguro de en qué condado te encuentras, di \"representante\".",
-                "speech_model": "default",
-                "speech_timeout": "5",
-                "stop_gather": false,
-                "timeout": 5
-            },
-            "transitions": [
-                {
-                    "event": "keypress"
-                },
-                {
-                    "event": "speech",
-                    "next": "validateCountySpanish"
-                },
-                {
-                    "event": "timeout",
-                    "next": "no_input_mssg_spanish"
-                }
-            ],
-            "type": "gather-input-on-call"
-        },
-        {
-            "name": "check_hours_english",
-            "properties": {
-                "add_twilio_auth": false,
-                "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-                "method": "GET",
-                "offset": {
-                    "x": -14,
-                    "y": 436
-                },
-                "url": "{{flow.variables.API_BASE_URL}}/opening_hours"
-            },
-            "transitions": [
-                {
-                    "event": "success",
-                    "next": "is_open_english"
-                },
-                {
-                    "event": "failed"
-                }
-            ],
-            "type": "make-http-request"
-        },
-        {
-            "name": "is_open_english",
-            "properties": {
-                "input": "{{widgets.check_hours_english.parsed.open}}",
-                "offset": {
-                    "x": -398,
-                    "y": 626
-                }
-            },
-            "transitions": [
-                {
-                    "event": "noMatch",
-                    "next": "closed_message_english"
-                },
-                {
-                    "conditions": [
-                        {
-                            "arguments": [
-                                "{{widgets.check_hours.parsed.open}}"
-                            ],
-                            "friendly_name": "If value equal_to true",
-                            "type": "equal_to",
-                            "value": "true"
-                        }
-                    ],
-                    "event": "match",
-                    "next": "set_counter"
-                }
-            ],
-            "type": "split-based-on"
-        },
-        {
-            "name": "closed_message_english",
-            "properties": {
-                "loop": 1,
-                "offset": {
-                    "x": -1411,
-                    "y": 849
-                },
-                "say": "Thank you for calling the New Jersey Prevention Hub Warm Line. If this is an emergency, please hang up and dial 911. Warm Line hours are 9AM to 4PM. For immediate resource assistance, visit www.gethelpnj.org. To hear this message again, press 1. To leave a voicemail for a Warm Line representative, press 2."
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "validateCounty",
-            "properties": {
-                "add_twilio_auth": false,
-                "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-                "method": "POST",
-                "offset": {
-                    "x": -585,
-                    "y": 1176
-                },
-                "parameters": [
-                    {
-                        "key": "county",
-                        "value": "{{widgets.gather_county.SpeechResult}}"
-                    }
-                ],
-                "url": "{{flow.variables.API_BASE_URL}}/validate_county"
-            },
-            "transitions": [
-                {
-                    "event": "success",
-                    "next": "isValid"
-                },
-                {
-                    "event": "failed",
-                    "next": "log_functionFail"
-                }
-            ],
-            "type": "make-http-request"
-        },
-        {
-            "name": "isValid",
-            "properties": {
-                "input": "{{widgets.validateCounty.parsed.valid}}",
-                "offset": {
-                    "x": -799,
-                    "y": 1377
-                }
-            },
-            "transitions": [
-                {
-                    "event": "noMatch",
-                    "next": "counter_add1"
-                },
-                {
-                    "conditions": [
-                        {
-                            "arguments": [
-                                "{{widgets.validateCounty.parsed.valid}}"
-                            ],
-                            "friendly_name": "If value equal_to true",
-                            "type": "equal_to",
-                            "value": "true"
-                        }
-                    ],
-                    "event": "match",
-                    "next": "connect_call_hubspot"
-                }
-            ],
-            "type": "split-based-on"
-        },
-        {
-            "name": "countyTryAgainMsg",
-            "properties": {
-                "loop": 1,
-                "offset": {
-                    "x": -1108,
-                    "y": 986
-                },
-                "say": "Sorry, we couldn’t find that county, please try again"
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete",
-                    "next": "gather_county"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "log_functionFail",
-            "properties": {
-                "loop": 1,
-                "offset": {
-                    "x": -215,
-                    "y": 1394
-                },
-                "say": "Sorry, we’re having trouble directing your call. You can access all our resources online at …"
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "set_counter",
-            "properties": {
-                "offset": {
-                    "x": 118,
-                    "y": 798
-                },
-                "variables": [
-                    {
-                        "key": "counter",
-                        "type": "string",
-                        "value": "0"
-                    }
-                ]
-            },
-            "transitions": [
-                {
-                    "event": "next",
-                    "next": "gather_county"
-                }
-            ],
-            "type": "set-variables"
-        },
-        {
-            "name": "counter_add1",
-            "properties": {
-                "offset": {
-                    "x": -1000,
-                    "y": 1734
-                },
-                "variables": [
-                    {
-                        "key": "counter",
-                        "type": "string",
-                        "value": "{{flow.variables.counter| plus: 1}}"
-                    }
-                ]
-            },
-            "transitions": [
-                {
-                    "event": "next",
-                    "next": "triesLeft"
-                }
-            ],
-            "type": "set-variables"
-        },
-        {
-            "name": "triesLeft",
-            "properties": {
-                "input": "{{flow.variables.counter}}",
-                "offset": {
-                    "x": -1398,
-                    "y": 1903
-                }
-            },
-            "transitions": [
-                {
-                    "event": "noMatch",
-                    "next": "county_areas"
-                },
-                {
-                    "conditions": [
-                        {
-                            "arguments": [
-                                "{{flow.variables.counter}}"
-                            ],
-                            "friendly_name": "If value less_than 3",
-                            "type": "less_than",
-                            "value": "3"
-                        }
-                    ],
-                    "event": "match",
-                    "next": "countyTryAgainMsg"
-                }
-            ],
-            "type": "split-based-on"
-        },
-        {
-            "name": "no_input_message",
-            "properties": {
-                "loop": 1,
-                "offset": {
-                    "x": 180,
-                    "y": 1167
-                },
-                "say": "Sorry, we could not detect your response. Please try again"
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete",
-                    "next": "counter_add1"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "check_hours_spanish",
-            "properties": {
-                "add_twilio_auth": false,
-                "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-                "method": "GET",
-                "offset": {
-                    "x": 1803,
-                    "y": 411
-                },
-                "url": "{{flow.variables.API_BASE_URL}}/opening_hours"
-            },
-            "transitions": [
-                {
-                    "event": "success",
-                    "next": "is_open_spanish"
-                },
-                {
-                    "event": "failed"
-                }
-            ],
-            "type": "make-http-request"
-        },
-        {
-            "name": "is_open_spanish",
-            "properties": {
-                "input": "{{widgets.check_hours_spanish.parsed.open}}",
-                "offset": {
-                    "x": 2359,
-                    "y": 611
-                }
-            },
-            "transitions": [
-                {
-                    "event": "noMatch",
-                    "next": "closed_message_spanish"
-                },
-                {
-                    "conditions": [
-                        {
-                            "arguments": [
-                                "{{widgets.check_hours_english.parsed.open}}"
-                            ],
-                            "friendly_name": "If value equal_to true",
-                            "type": "equal_to",
-                            "value": "true"
-                        }
-                    ],
-                    "event": "match",
-                    "next": "set_counter_spanish"
-                }
-            ],
-            "type": "split-based-on"
-        },
-        {
-            "name": "closed_message_spanish",
-            "properties": {
-                "language": "es-US",
-                "loop": 1,
-                "offset": {
-                    "x": 1959,
-                    "y": 778
-                },
-                "say": "Gracias por llamar a New Jersey Prevention Hub Warm Line.  Si esto es una emergencia, por favor cuelgue y llame al 911. El horario de la Línea es de 9AM a 4PM. Para asistencia inmediata con recursos, visite www.gethelpnj.org. Para escuchar este mensaje nuevamente, pulsa el 1. Para dejar un mensaje de voz a un representante de la Línea, pulsa el 2."
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "set_counter_spanish",
-            "properties": {
-                "offset": {
-                    "x": 2784,
-                    "y": 807
-                },
-                "variables": [
-                    {
-                        "key": "counter_spanish",
-                        "type": "string",
-                        "value": "0"
-                    }
-                ]
-            },
-            "transitions": [
-                {
-                    "event": "next",
-                    "next": "gather_county_spanish"
-                }
-            ],
-            "type": "set-variables"
-        },
-        {
-            "name": "validateCountySpanish",
-            "properties": {
-                "add_twilio_auth": false,
-                "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-                "method": "POST",
-                "offset": {
-                    "x": 1704,
-                    "y": 1279
-                },
-                "parameters": [
-                    {
-                        "key": "county",
-                        "value": "{{widgets.gather_county_spanish.SpeechResult}}"
-                    }
-                ],
-                "url": "{{flow.variables.API_BASE_URL}}/validate_county"
-            },
-            "transitions": [
-                {
-                    "event": "success",
-                    "next": "isValid_spanish"
-                },
-                {
-                    "event": "failed",
-                    "next": "log_functionFail2"
-                }
-            ],
-            "type": "make-http-request"
-        },
-        {
-            "name": "no_input_mssg_spanish",
-            "properties": {
-                "language": "es-US",
-                "loop": 1,
-                "offset": {
-                    "x": 2794,
-                    "y": 1241
-                },
-                "say": "Lo sentimos, no pudimos detectar tu respuesta. Por favor, inténtalo de nuevo"
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete",
-                    "next": "counter_add1_spa"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "log_functionFail2",
-            "properties": {
-                "loop": 1,
-                "offset": {
-                    "x": 2245,
-                    "y": 1468
-                },
-                "say": "Lo sentimos, estamos teniendo problemas para transferir su llamada. Puede acceder a todos nuestros recursos en línea en…"
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "isValid_spanish",
-            "properties": {
-                "input": "{{widgets.validateCountySpanish.parsed.valid}}",
-                "offset": {
-                    "x": 1372,
-                    "y": 1478
-                }
-            },
-            "transitions": [
-                {
-                    "event": "noMatch",
-                    "next": "counter_add1_spa"
-                },
-                {
-                    "conditions": [
-                        {
-                            "arguments": [
-                                "{{widgets.validateCounty.parsed.valid}}"
-                            ],
-                            "friendly_name": "If value equal_to true",
-                            "type": "equal_to",
-                            "value": "true"
-                        }
-                    ],
-                    "event": "match",
-                    "next": "lookup_county_number_spanish"
-                }
-            ],
-            "type": "split-based-on"
-        },
-        {
-            "name": "counter_add1_spa",
-            "properties": {
-                "offset": {
-                    "x": 934,
-                    "y": 1865
-                },
-                "variables": [
-                    {
-                        "key": "counter_spanish",
-                        "type": "string",
-                        "value": "{{flow.variables.counter_spanish| plus: 1}}"
-                    }
-                ]
-            },
-            "transitions": [
-                {
-                    "event": "next",
-                    "next": "triesLeft_spa"
-                }
-            ],
-            "type": "set-variables"
-        },
-        {
-            "name": "triesLeft_spa",
-            "properties": {
-                "input": "{{flow.variables.counter_spanish}}",
-                "offset": {
-                    "x": 1203,
-                    "y": 2055
-                }
-            },
-            "transitions": [
-                {
-                    "event": "noMatch",
-                    "next": "county_areas_spanish"
-                },
-                {
-                    "conditions": [
-                        {
-                            "arguments": [
-                                "{{flow.variables.counter_spanish}}"
-                            ],
-                            "friendly_name": "If value less_than 3",
-                            "type": "less_than",
-                            "value": "3"
-                        }
-                    ],
-                    "event": "match",
-                    "next": "countyTryAgainMsg_spa"
-                }
-            ],
-            "type": "split-based-on"
-        },
-        {
-            "name": "countyTryAgainMsg_spa",
-            "properties": {
-                "language": "es-US",
-                "loop": 1,
-                "offset": {
-                    "x": 1508,
-                    "y": 2220
-                },
-                "say": "Lo sentimos, no hemos podido encontrar ese condado. Inténtalo de nuevo, por favor."
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete",
-                    "next": "gather_county_spanish"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "say_language",
-            "properties": {
-                "language": "en-US",
-                "loop": 1,
-                "offset": {
-                    "x": 704,
-                    "y": -123
-                },
-                "say": "If you’d like to continue in English, press 1."
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete",
-                    "next": "gather_language"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "connect_to_county_spanish",
-            "properties": {
-                "caller_id": "{{contact.channel.address}}",
-                "noun": "number",
-                "offset": {
-                    "x": 2006,
-                    "y": 2200
-                },
-                "timeout": 30,
-                "to": "{{widgets.lookup_county_number_spanish.parsed.number}}"
-            },
-            "transitions": [
-                {
-                    "event": "callCompleted"
-                },
-                {
-                    "event": "hangup"
-                }
-            ],
-            "type": "connect-call-to"
-        },
-        {
-            "name": "lookup_county_number_spanish",
-            "properties": {
-                "add_twilio_auth": false,
-                "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-                "method": "GET",
-                "offset": {
-                    "x": 2023,
-                    "y": 1742
-                },
-                "parameters": [
-                    {
-                        "key": "county",
-                        "value": "{{widgets.validateCountySpanish.parsed.county}}"
-                    }
-                ],
-                "url": "{{flow.variables.API_BASE_URL}}/county_number"
-            },
-            "transitions": [
-                {
-                    "event": "success",
-                    "next": "connect_test"
-                },
-                {
-                    "event": "failed",
-                    "next": "say_play_3"
-                }
-            ],
-            "type": "make-http-request"
-        },
-        {
-            "name": "connect_test",
-            "properties": {
-                "loop": 1,
-                "offset": {
-                    "x": 2005,
-                    "y": 1988
-                },
-                "say": "El número es {{widgets.lookup_county_number_spanish.parsed.number}}"
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete",
-                    "next": "connect_to_county_spanish"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "say_play_3",
-            "properties": {
-                "loop": 1,
-                "offset": {
-                    "x": 2362,
-                    "y": 1989
-                },
-                "say": "Lo sentimos, estamos teniendo problemas para transferir su llamada. Puede acceder a todos nuestros recursos en línea en…"
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "connect_call_hubspot",
-            "properties": {
-                "caller_id": "{{contact.channel.address}}",
-                "noun": "number",
-                "offset": {
-                    "x": -498,
-                    "y": 1704
-                },
-                "timeout": 23,
-                "to": "{{flow.variables.HUBSPOT_NUMBER}}"
-            },
-            "transitions": [
-                {
-                    "event": "callCompleted",
-                    "next": "lookup_county_number"
-                },
-                {
-                    "event": "hangup"
-                }
-            ],
-            "type": "connect-call-to"
-        },
-        {
-            "name": "lookup_county_number",
-            "properties": {
-                "add_twilio_auth": false,
-                "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-                "method": "GET",
-                "offset": {
-                    "x": -164,
-                    "y": 1887
-                },
-                "parameters": [
-                    {
-                        "key": "county",
-                        "value": "{{widgets.validateCounty.parsed.county}}"
-                    }
-                ],
-                "url": "{{flow.variables.API_BASE_URL}}/county_number"
-            },
-            "transitions": [
-                {
-                    "event": "success",
-                    "next": "Copy_of_connect_to_county"
-                },
-                {
-                    "event": "failed",
-                    "next": "Copy_of_say_play_3"
-                }
-            ],
-            "type": "make-http-request"
-        },
-        {
-            "name": "Copy_of_say_play_3",
-            "properties": {
-                "loop": 1,
-                "offset": {
-                    "x": 41,
-                    "y": 2151
-                },
-                "say": "Sorry, we’re having trouble directing your call. You can access all our resources online at …"
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "Copy_of_connect_to_county",
-            "properties": {
-                "caller_id": "{{contact.channel.address}}",
-                "noun": "number",
-                "offset": {
-                    "x": -445,
-                    "y": 2168
-                },
-                "timeout": 30,
-                "to": "{{widgets.lookup_county_number.parsed.number}}"
-            },
-            "transitions": [
-                {
-                    "event": "callCompleted"
-                },
-                {
-                    "event": "hangup"
-                }
-            ],
-            "type": "connect-call-to"
-        },
-        {
-            "name": "county_areas",
-            "properties": {
-                "finish_on_key": "#",
-                "gather_language": "en",
-                "language": "en-US",
-                "loop": 1,
-                "offset": {
-                    "x": -1873,
-                    "y": 2099
-                },
-                "say": "Please enter the first 3 letters of your county, each letter as a single digit. For example, the first 3 digits of Atlantic are ATL, so the number would be 285.",
-                "speech_model": "default",
-                "speech_timeout": "5",
-                "stop_gather": false,
-                "timeout": 5
-            },
-            "transitions": [
-                {
-                    "event": "keypress",
-                    "next": "map_county"
-                },
-                {
-                    "event": "speech"
-                },
-                {
-                    "event": "timeout"
-                }
-            ],
-            "type": "gather-input-on-call"
-        },
-        {
-            "name": "lookup_failed",
-            "properties": {
-                "language": "en-US",
-                "loop": 1,
-                "offset": {
-                    "x": -1125,
-                    "y": 2755
-                },
-                "say": "Sorry, we’re having trouble directing your call. You can access all our resources online at …"
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "connect_to_county",
-            "properties": {
-                "loop": 1,
-                "offset": {
-                    "x": -1953,
-                    "y": 2763
-                },
-                "say": "You are calling from {{widgets.map_county.parsed.county}} county. The number for this county is {{widgets.lookup_county_from_digit.parsed.number}}."
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete",
-                    "next": "send_to_county"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "send_to_county",
-            "properties": {
-                "caller_id": "{{contact.channel.address}}",
-                "noun": "number",
-                "offset": {
-                    "x": -1950,
-                    "y": 2958
-                },
-                "timeout": 30,
-                "to": "{{widgets.map_county.parsed.number}}"
-            },
-            "transitions": [
-                {
-                    "event": "callCompleted"
-                },
-                {
-                    "event": "hangup"
-                }
-            ],
-            "type": "connect-call-to"
-        },
-        {
-            "name": "county_areas_spanish",
-            "properties": {
-                "finish_on_key": "#",
-                "gather_language": "en",
-                "language": "es-US",
-                "loop": 1,
-                "offset": {
-                    "x": 746,
-                    "y": 2223
-                },
-                "say": "Por favor, introduzca las tres primeras letras de su condado, tratando cada letra como un dígito individual. Por ejemplo, las tres primeras letras de Atlantic son ATL, por lo que el número sería 285.",
-                "speech_model": "default",
-                "speech_timeout": "5",
-                "stop_gather": false,
-                "timeout": 5
-            },
-            "transitions": [
-                {
-                    "event": "keypress",
-                    "next": "map_county_spanish"
-                },
-                {
-                    "event": "speech"
-                },
-                {
-                    "event": "timeout"
-                }
-            ],
-            "type": "gather-input-on-call"
-        },
-        {
-            "name": "lookup_failed_spanish",
-            "properties": {
-                "language": "es-US",
-                "loop": 1,
-                "offset": {
-                    "x": 1422,
-                    "y": 2882
-                },
-                "say": "Lo sentimos, estamos teniendo problemas para transferir su llamada. Puede acceder a todos nuestros recursos en línea en…"
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "map_county",
-            "properties": {
-                "add_twilio_auth": false,
-                "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-                "method": "GET",
-                "offset": {
-                    "x": -1306,
-                    "y": 2294
-                },
-                "parameters": [
-                    {
-                        "key": "pin",
-                        "value": "{{widgets.county_areas.Digits}}"
-                    }
-                ],
-                "url": "{{flow.variables.API_BASE_URL}}/county_mapping"
-            },
-            "transitions": [
-                {
-                    "event": "success",
-                    "next": "lookup_county_from_digit"
-                },
-                {
-                    "event": "failed",
-                    "next": "lookup_failed"
-                }
-            ],
-            "type": "make-http-request"
-        },
-        {
-            "name": "lookup_county_from_digit",
-            "properties": {
-                "add_twilio_auth": false,
-                "body": "{{flow.variables.API_BASE_URL}}/county_mapping",
-                "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-                "method": "GET",
-                "offset": {
-                    "x": -1606,
-                    "y": 2535
-                },
-                "parameters": [
-                    {
-                        "key": "county",
-                        "value": "{{widgets.map_county.parsed.county}}"
-                    }
-                ],
-                "url": "{{flow.variables.API_BASE_URL}}/county_number"
-            },
-            "transitions": [
-                {
-                    "event": "success",
-                    "next": "connect_to_county"
-                },
-                {
-                    "event": "failed",
-                    "next": "lookup_failed"
-                }
-            ],
-            "type": "make-http-request"
-        },
-        {
-            "name": "map_county_spanish",
-            "properties": {
-                "add_twilio_auth": false,
-                "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-                "method": "GET",
-                "offset": {
-                    "x": 1221,
-                    "y": 2423
-                },
-                "parameters": [
-                    {
-                        "key": "pin",
-                        "value": "{{widgets.county_areas_spanish.Digits}}"
-                    }
-                ],
-                "url": "{{flow.variables.API_BASE_URL}}/county_mapping"
-            },
-            "transitions": [
-                {
-                    "event": "success",
-                    "next": "lookup_county_from_digit_spanish"
-                },
-                {
-                    "event": "failed",
-                    "next": "lookup_failed_spanish"
-                }
-            ],
-            "type": "make-http-request"
-        },
-        {
-            "name": "lookup_county_from_digit_spanish",
-            "properties": {
-                "add_twilio_auth": false,
-                "body": "{{flow.variables.API_BASE_URL}}/county_mapping",
-                "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-                "method": "GET",
-                "offset": {
-                    "x": 910,
-                    "y": 2625
-                },
-                "parameters": [
-                    {
-                        "key": "county",
-                        "value": "{{widgets.map_county_spanish.parsed.county}}"
-                    }
-                ],
-                "url": "{{flow.variables.API_BASE_URL}}/county_number"
-            },
-            "transitions": [
-                {
-                    "event": "success",
-                    "next": "connect_to_county_from_digit"
-                },
-                {
-                    "event": "failed",
-                    "next": "lookup_failed_spanish"
-                }
-            ],
-            "type": "make-http-request"
-        },
-        {
-            "name": "connect_to_county_from_digit",
-            "properties": {
-                "language": "es-US",
-                "loop": 1,
-                "offset": {
-                    "x": 804,
-                    "y": 2896
-                },
-                "say": "Está llamando desde el condado de {{widgets.map_county_spanish.parsed.county}}. El número para este condado es {{widgets.lookup_county_from_digit_spanish.parsed.number}}."
-            },
-            "transitions": [
-                {
-                    "event": "audioComplete",
-                    "next": "send_to_county_spanish"
-                }
-            ],
-            "type": "say-play"
-        },
-        {
-            "name": "send_to_county_spanish",
-            "properties": {
-                "caller_id": "{{contact.channel.address}}",
-                "noun": "number",
-                "offset": {
-                    "x": 807,
-                    "y": 3083
-                },
-                "timeout": 30,
-                "to": "{{widgets.map_county_spanish.parsed.number}}"
-            },
-            "transitions": [
-                {
-                    "event": "callCompleted"
-                },
-                {
-                    "event": "hangup"
-                }
-            ],
-            "type": "connect-call-to"
-        },
-        {
-            "name": "set_variables",
-            "properties": {
-                "offset": {
-                    "x": 983,
-                    "y": -599
-                },
-                "variables": [
-                    {
-                        "key": "API_BASE_URL",
-                        "type": "string",
-                        "value": "${API_BASE_URL}"
-                    },
-                    {
-                        "key": "HUBSPOT_NUMBER",
-                        "type": "string",
-                        "value": "${HUBSPOT_NUMBER}"
-                    }
-                ]
-            },
-            "transitions": [
-                {
-                    "event": "next",
-                    "next": "welcome_msg"
-                }
-            ],
-            "type": "set-variables"
+  "description": "A New Flow",
+  "flags": {
+    "allow_concurrent_calls": true
+  },
+  "initial_state": "Trigger",
+  "states": [
+    {
+      "name": "Trigger",
+      "properties": {
+        "offset": {
+          "x": 828,
+          "y": -862
         }
-    ]
+      },
+      "transitions": [
+        {
+          "event": "incomingMessage"
+        },
+        {
+          "event": "incomingCall",
+          "next": "set_variables"
+        },
+        {
+          "event": "incomingConversationMessage"
+        },
+        {
+          "event": "incomingRequest"
+        },
+        {
+          "event": "incomingParent"
+        }
+      ],
+      "type": "trigger"
+    },
+    {
+      "name": "welcome_msg",
+      "properties": {
+        "language": "en-US",
+        "loop": 1,
+        "offset": {
+          "x": 1259,
+          "y": -322
+        },
+        "say": "Thank you for calling the New Jersey Prevention Hub Warm Line. If this is an emergency, please hang up and dial 911."
+      },
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "say_language"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "gather_language",
+      "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en",
+        "language": "es-US",
+        "loop": 1,
+        "number_of_digits": 1,
+        "offset": {
+          "x": 1168,
+          "y": 67
+        },
+        "say": "Para escuchar en español, pulsa el 2",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
+      "transitions": [
+        {
+          "event": "keypress",
+          "next": "split_language"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "type": "gather-input-on-call"
+    },
+    {
+      "name": "gather_county",
+      "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en",
+        "language": "en-US",
+        "loop": 1,
+        "offset": {
+          "x": -322,
+          "y": 977
+        },
+        "say": "To connect with resources near you, please say the name of your county. If you're not sure which county you're in, say \"representative.\"",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
+      "transitions": [
+        {
+          "event": "keypress"
+        },
+        {
+          "event": "speech",
+          "next": "validateCounty"
+        },
+        {
+          "event": "timeout",
+          "next": "counter_add1"
+        }
+      ],
+      "type": "gather-input-on-call"
+    },
+    {
+      "name": "split_language",
+      "properties": {
+        "input": "{{widgets.gather_language.Digits}}",
+        "offset": {
+          "x": 817,
+          "y": 240
+        }
+      },
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.gather_language.Digits}}"
+              ],
+              "friendly_name": "If value equal_to 1",
+              "type": "equal_to",
+              "value": "1"
+            }
+          ],
+          "event": "match",
+          "next": "check_hours_english"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.gather_language.Digits}}"
+              ],
+              "friendly_name": "If value equal_to 2",
+              "type": "equal_to",
+              "value": "2"
+            }
+          ],
+          "event": "match",
+          "next": "check_hours_spanish"
+        }
+      ],
+      "type": "split-based-on"
+    },
+    {
+      "name": "gather_county_spanish",
+      "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en-US",
+        "language": "es-US",
+        "loop": 1,
+        "offset": {
+          "x": 2129,
+          "y": 1084
+        },
+        "say": "Para conectarte con los recursos cercanos, por favor di el nombre de tu condado. Si no estás seguro de en qué condado te encuentras, di \"representante\".",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
+      "transitions": [
+        {
+          "event": "keypress"
+        },
+        {
+          "event": "speech",
+          "next": "validateCountySpanish"
+        },
+        {
+          "event": "timeout",
+          "next": "counter_add1_spa"
+        }
+      ],
+      "type": "gather-input-on-call"
+    },
+    {
+      "name": "check_hours_english",
+      "properties": {
+        "add_twilio_auth": false,
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "GET",
+        "offset": {
+          "x": -14,
+          "y": 436
+        },
+        "url": "{{flow.variables.API_BASE_URL}}/opening_hours"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "is_open_english"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "type": "make-http-request"
+    },
+    {
+      "name": "is_open_english",
+      "properties": {
+        "input": "{{widgets.check_hours_english.parsed.open}}",
+        "offset": {
+          "x": -398,
+          "y": 626
+        }
+      },
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "closed_message_english"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.check_hours.parsed.open}}"
+              ],
+              "friendly_name": "If value equal_to true",
+              "type": "equal_to",
+              "value": "true"
+            }
+          ],
+          "event": "match",
+          "next": "set_counter"
+        }
+      ],
+      "type": "split-based-on"
+    },
+    {
+      "name": "closed_message_english",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -1411,
+          "y": 849
+        },
+        "say": "Thank you for calling the New Jersey Prevention Hub Warm Line. If this is an emergency, please hang up and dial 911. Warm Line hours are 9AM to 4PM. For immediate resource assistance, visit www.gethelpnj.org. To hear this message again, press 1. To leave a voicemail for a Warm Line representative, press 2."
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "validateCounty",
+      "properties": {
+        "add_twilio_auth": false,
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "POST",
+        "offset": {
+          "x": -585,
+          "y": 1176
+        },
+        "parameters": [
+          {
+            "key": "county",
+            "value": "{{widgets.gather_county.SpeechResult}}"
+          }
+        ],
+        "url": "{{flow.variables.API_BASE_URL}}/validate_county"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "isValid"
+        },
+        {
+          "event": "failed",
+          "next": "log_functionFail"
+        }
+      ],
+      "type": "make-http-request"
+    },
+    {
+      "name": "isValid",
+      "properties": {
+        "input": "{{widgets.validateCounty.parsed.valid}}",
+        "offset": {
+          "x": -799,
+          "y": 1377
+        }
+      },
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "counter_add1"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.validateCounty.parsed.valid}}"
+              ],
+              "friendly_name": "If value equal_to true",
+              "type": "equal_to",
+              "value": "true"
+            }
+          ],
+          "event": "match",
+          "next": "connect_call_hubspot"
+        }
+      ],
+      "type": "split-based-on"
+    },
+    {
+      "name": "countyTryAgainMsg",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -1108,
+          "y": 986
+        },
+        "say": "Sorry, we couldn’t find that county, please try again"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "gather_county"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "log_functionFail",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -241,
+          "y": 1392
+        },
+        "say": "Sorry, we’re having trouble directing your call. You can access all our resources online at …"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "set_counter",
+      "properties": {
+        "offset": {
+          "x": 118,
+          "y": 798
+        },
+        "variables": [
+          {
+            "key": "counter",
+            "type": "string",
+            "value": "0"
+          }
+        ]
+      },
+      "transitions": [
+        {
+          "event": "next",
+          "next": "gather_county"
+        }
+      ],
+      "type": "set-variables"
+    },
+    {
+      "name": "counter_add1",
+      "properties": {
+        "offset": {
+          "x": -1033,
+          "y": 1691
+        },
+        "variables": [
+          {
+            "key": "counter",
+            "type": "string",
+            "value": "{{flow.variables.counter| plus: 1}}"
+          }
+        ]
+      },
+      "transitions": [
+        {
+          "event": "next",
+          "next": "triesLeft"
+        }
+      ],
+      "type": "set-variables"
+    },
+    {
+      "name": "triesLeft",
+      "properties": {
+        "input": "{{flow.variables.counter}}",
+        "offset": {
+          "x": -1375,
+          "y": 1876
+        }
+      },
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "county_areas"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{flow.variables.counter}}"
+              ],
+              "friendly_name": "If value less_than 3",
+              "type": "less_than",
+              "value": "3"
+            }
+          ],
+          "event": "match",
+          "next": "countyTryAgainMsg"
+        }
+      ],
+      "type": "split-based-on"
+    },
+    {
+      "name": "check_hours_spanish",
+      "properties": {
+        "add_twilio_auth": false,
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "GET",
+        "offset": {
+          "x": 1803,
+          "y": 411
+        },
+        "url": "{{flow.variables.API_BASE_URL}}/opening_hours"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "is_open_spanish"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "type": "make-http-request"
+    },
+    {
+      "name": "is_open_spanish",
+      "properties": {
+        "input": "{{widgets.check_hours_spanish.parsed.open}}",
+        "offset": {
+          "x": 2359,
+          "y": 611
+        }
+      },
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "closed_message_spanish"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.check_hours_english.parsed.open}}"
+              ],
+              "friendly_name": "If value equal_to true",
+              "type": "equal_to",
+              "value": "true"
+            }
+          ],
+          "event": "match",
+          "next": "set_counter_spanish"
+        }
+      ],
+      "type": "split-based-on"
+    },
+    {
+      "name": "closed_message_spanish",
+      "properties": {
+        "language": "es-US",
+        "loop": 1,
+        "offset": {
+          "x": 1959,
+          "y": 778
+        },
+        "say": "Gracias por llamar a New Jersey Prevention Hub Warm Line.  Si esto es una emergencia, por favor cuelgue y llame al 911. El horario de la Línea es de 9AM a 4PM. Para asistencia inmediata con recursos, visite www.gethelpnj.org. Para escuchar este mensaje nuevamente, pulsa el 1. Para dejar un mensaje de voz a un representante de la Línea, pulsa el 2."
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "set_counter_spanish",
+      "properties": {
+        "offset": {
+          "x": 2784,
+          "y": 807
+        },
+        "variables": [
+          {
+            "key": "counter_spanish",
+            "type": "string",
+            "value": "0"
+          }
+        ]
+      },
+      "transitions": [
+        {
+          "event": "next",
+          "next": "gather_county_spanish"
+        }
+      ],
+      "type": "set-variables"
+    },
+    {
+      "name": "validateCountySpanish",
+      "properties": {
+        "add_twilio_auth": false,
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "POST",
+        "offset": {
+          "x": 1704,
+          "y": 1279
+        },
+        "parameters": [
+          {
+            "key": "county",
+            "value": "{{widgets.gather_county_spanish.SpeechResult}}"
+          }
+        ],
+        "url": "{{flow.variables.API_BASE_URL}}/validate_county"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "isValid_spanish"
+        },
+        {
+          "event": "failed",
+          "next": "log_functionFail2"
+        }
+      ],
+      "type": "make-http-request"
+    },
+    {
+      "name": "log_functionFail2",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": 2245,
+          "y": 1468
+        },
+        "say": "Lo sentimos, estamos teniendo problemas para transferir su llamada. Puede acceder a todos nuestros recursos en línea en…"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "isValid_spanish",
+      "properties": {
+        "input": "{{widgets.validateCountySpanish.parsed.valid}}",
+        "offset": {
+          "x": 1372,
+          "y": 1478
+        }
+      },
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "counter_add1_spa"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.validateCounty.parsed.valid}}"
+              ],
+              "friendly_name": "If value equal_to true",
+              "type": "equal_to",
+              "value": "true"
+            }
+          ],
+          "event": "match",
+          "next": "lookup_county_number_spanish"
+        }
+      ],
+      "type": "split-based-on"
+    },
+    {
+      "name": "counter_add1_spa",
+      "properties": {
+        "offset": {
+          "x": 934,
+          "y": 1865
+        },
+        "variables": [
+          {
+            "key": "counter_spanish",
+            "type": "string",
+            "value": "{{flow.variables.counter_spanish| plus: 1}}"
+          }
+        ]
+      },
+      "transitions": [
+        {
+          "event": "next",
+          "next": "triesLeft_spa"
+        }
+      ],
+      "type": "set-variables"
+    },
+    {
+      "name": "triesLeft_spa",
+      "properties": {
+        "input": "{{flow.variables.counter_spanish}}",
+        "offset": {
+          "x": 1203,
+          "y": 2055
+        }
+      },
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "county_areas_spanish"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{flow.variables.counter_spanish}}"
+              ],
+              "friendly_name": "If value less_than 3",
+              "type": "less_than",
+              "value": "3"
+            }
+          ],
+          "event": "match",
+          "next": "countyTryAgainMsg_spa"
+        }
+      ],
+      "type": "split-based-on"
+    },
+    {
+      "name": "countyTryAgainMsg_spa",
+      "properties": {
+        "language": "es-US",
+        "loop": 1,
+        "offset": {
+          "x": 1508,
+          "y": 2220
+        },
+        "say": "Lo sentimos, no hemos podido encontrar ese condado. Inténtalo de nuevo, por favor."
+      },
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "gather_county_spanish"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "say_language",
+      "properties": {
+        "language": "en-US",
+        "loop": 1,
+        "offset": {
+          "x": 704,
+          "y": -123
+        },
+        "say": "If you’d like to continue in English, press 1."
+      },
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "gather_language"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "connect_to_county_spanish",
+      "properties": {
+        "caller_id": "{{contact.channel.address}}",
+        "noun": "number",
+        "offset": {
+          "x": 2006,
+          "y": 2200
+        },
+        "timeout": 30,
+        "to": "{{widgets.lookup_county_number_spanish.parsed.number}}"
+      },
+      "transitions": [
+        {
+          "event": "callCompleted"
+        },
+        {
+          "event": "hangup"
+        }
+      ],
+      "type": "connect-call-to"
+    },
+    {
+      "name": "lookup_county_number_spanish",
+      "properties": {
+        "add_twilio_auth": false,
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "GET",
+        "offset": {
+          "x": 2023,
+          "y": 1742
+        },
+        "parameters": [
+          {
+            "key": "county",
+            "value": "{{widgets.validateCountySpanish.parsed.county}}"
+          }
+        ],
+        "url": "{{flow.variables.API_BASE_URL}}/county_number"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "connect_test"
+        },
+        {
+          "event": "failed",
+          "next": "say_play_3"
+        }
+      ],
+      "type": "make-http-request"
+    },
+    {
+      "name": "connect_test",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": 2005,
+          "y": 1988
+        },
+        "say": "Conectándole con su condado."
+      },
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "connect_to_county_spanish"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "say_play_3",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": 2362,
+          "y": 1989
+        },
+        "say": "Lo sentimos, estamos teniendo problemas para transferir su llamada. Puede acceder a todos nuestros recursos en línea en…"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "connect_call_hubspot",
+      "properties": {
+        "caller_id": "{{contact.channel.address}}",
+        "noun": "number",
+        "offset": {
+          "x": -590,
+          "y": 1676
+        },
+        "timeout": 23,
+        "to": "{{flow.variables.HUBSPOT_NUMBER}}"
+      },
+      "transitions": [
+        {
+          "event": "callCompleted",
+          "next": "lookup_county_number"
+        },
+        {
+          "event": "hangup"
+        }
+      ],
+      "type": "connect-call-to"
+    },
+    {
+      "name": "lookup_county_number",
+      "properties": {
+        "add_twilio_auth": false,
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "GET",
+        "offset": {
+          "x": -157,
+          "y": 1904
+        },
+        "parameters": [
+          {
+            "key": "county",
+            "value": "{{widgets.validateCounty.parsed.county}}"
+          }
+        ],
+        "url": "{{flow.variables.API_BASE_URL}}/county_number"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "Copy_of_connect_to_county"
+        },
+        {
+          "event": "failed",
+          "next": "Copy_of_say_play_3"
+        }
+      ],
+      "type": "make-http-request"
+    },
+    {
+      "name": "Copy_of_say_play_3",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": 41,
+          "y": 2151
+        },
+        "say": "Sorry, we’re having trouble directing your call. You can access all our resources online at …"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "Copy_of_connect_to_county",
+      "properties": {
+        "caller_id": "{{contact.channel.address}}",
+        "noun": "number",
+        "offset": {
+          "x": -445,
+          "y": 2168
+        },
+        "timeout": 30,
+        "to": "{{widgets.lookup_county_number.parsed.number}}"
+      },
+      "transitions": [
+        {
+          "event": "callCompleted"
+        },
+        {
+          "event": "hangup"
+        }
+      ],
+      "type": "connect-call-to"
+    },
+    {
+      "name": "county_areas",
+      "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en",
+        "language": "en-US",
+        "loop": 1,
+        "offset": {
+          "x": -1707,
+          "y": 2058
+        },
+        "say": "Please enter the first 3 letters of your county, each letter as a single digit. For example, the first 3 digits of Atlantic are ATL, so the number would be 285.",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
+      "transitions": [
+        {
+          "event": "keypress",
+          "next": "map_county"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "type": "gather-input-on-call"
+    },
+    {
+      "name": "lookup_failed",
+      "properties": {
+        "language": "en-US",
+        "loop": 1,
+        "offset": {
+          "x": -1141,
+          "y": 2692
+        },
+        "say": "Sorry, we’re having trouble directing your call. You can access all our resources online at …"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "connect_to_county",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -1939,
+          "y": 2706
+        },
+        "say": "You are calling from {{widgets.map_county.parsed.county}} county. Connecting you to your county."
+      },
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "send_to_county"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "send_to_county",
+      "properties": {
+        "caller_id": "{{contact.channel.address}}",
+        "noun": "number",
+        "offset": {
+          "x": -1934,
+          "y": 2906
+        },
+        "timeout": 30,
+        "to": "{{widgets.lookup_county_from_digit.parsed.number}}"
+      },
+      "transitions": [
+        {
+          "event": "callCompleted"
+        },
+        {
+          "event": "hangup"
+        }
+      ],
+      "type": "connect-call-to"
+    },
+    {
+      "name": "county_areas_spanish",
+      "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en",
+        "language": "es-US",
+        "loop": 1,
+        "offset": {
+          "x": 746,
+          "y": 2223
+        },
+        "say": "Por favor, introduzca las tres primeras letras de su condado, tratando cada letra como un dígito individual. Por ejemplo, las tres primeras letras de Atlantic son ATL, por lo que el número sería 285.",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
+      "transitions": [
+        {
+          "event": "keypress",
+          "next": "map_county_spanish"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "type": "gather-input-on-call"
+    },
+    {
+      "name": "lookup_failed_spanish",
+      "properties": {
+        "language": "es-US",
+        "loop": 1,
+        "offset": {
+          "x": 1422,
+          "y": 2882
+        },
+        "say": "Lo sentimos, estamos teniendo problemas para transferir su llamada. Puede acceder a todos nuestros recursos en línea en…"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "map_county",
+      "properties": {
+        "add_twilio_auth": false,
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "GET",
+        "offset": {
+          "x": -1297,
+          "y": 2278
+        },
+        "parameters": [
+          {
+            "key": "pin",
+            "value": "{{widgets.county_areas.Digits}}"
+          }
+        ],
+        "url": "{{flow.variables.API_BASE_URL}}/county_mapping"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "lookup_county_from_digit"
+        },
+        {
+          "event": "failed",
+          "next": "lookup_failed"
+        }
+      ],
+      "type": "make-http-request"
+    },
+    {
+      "name": "lookup_county_from_digit",
+      "properties": {
+        "add_twilio_auth": false,
+        "body": "{{flow.variables.API_BASE_URL}}/county_mapping",
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "GET",
+        "offset": {
+          "x": -1595,
+          "y": 2489
+        },
+        "parameters": [
+          {
+            "key": "county",
+            "value": "{{widgets.map_county.parsed.county}}"
+          }
+        ],
+        "url": "{{flow.variables.API_BASE_URL}}/county_number"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "connect_to_county"
+        },
+        {
+          "event": "failed",
+          "next": "lookup_failed"
+        }
+      ],
+      "type": "make-http-request"
+    },
+    {
+      "name": "map_county_spanish",
+      "properties": {
+        "add_twilio_auth": false,
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "GET",
+        "offset": {
+          "x": 1221,
+          "y": 2423
+        },
+        "parameters": [
+          {
+            "key": "pin",
+            "value": "{{widgets.county_areas_spanish.Digits}}"
+          }
+        ],
+        "url": "{{flow.variables.API_BASE_URL}}/county_mapping"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "lookup_county_from_digit_spanish"
+        },
+        {
+          "event": "failed",
+          "next": "lookup_failed_spanish"
+        }
+      ],
+      "type": "make-http-request"
+    },
+    {
+      "name": "lookup_county_from_digit_spanish",
+      "properties": {
+        "add_twilio_auth": false,
+        "body": "{{flow.variables.API_BASE_URL}}/county_mapping",
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "GET",
+        "offset": {
+          "x": 910,
+          "y": 2625
+        },
+        "parameters": [
+          {
+            "key": "county",
+            "value": "{{widgets.map_county_spanish.parsed.county}}"
+          }
+        ],
+        "url": "{{flow.variables.API_BASE_URL}}/county_number"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "connect_to_county_from_digit"
+        },
+        {
+          "event": "failed",
+          "next": "lookup_failed_spanish"
+        }
+      ],
+      "type": "make-http-request"
+    },
+    {
+      "name": "connect_to_county_from_digit",
+      "properties": {
+        "language": "es-US",
+        "loop": 1,
+        "offset": {
+          "x": 804,
+          "y": 2896
+        },
+        "say": "Está llamando desde el condado de {{widgets.map_county_spanish.parsed.county}}. Conectándole con su condado.."
+      },
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "send_to_county_spanish"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "send_to_county_spanish",
+      "properties": {
+        "caller_id": "{{contact.channel.address}}",
+        "noun": "number",
+        "offset": {
+          "x": 807,
+          "y": 3083
+        },
+        "timeout": 30,
+        "to": "{{widgets.lookup_county_from_digit_spanish.parsed.number}}"
+      },
+      "transitions": [
+        {
+          "event": "callCompleted"
+        },
+        {
+          "event": "hangup"
+        }
+      ],
+      "type": "connect-call-to"
+    },
+    {
+      "name": "set_variables",
+      "properties": {
+        "offset": {
+          "x": 983,
+          "y": -599
+        },
+        "variables": [
+          {
+            "key": "API_BASE_URL",
+            "type": "string",
+            "value": "https://njpn-7517.twil.io"
+          },
+          {
+            "key": "HUBSPOT_NUMBER",
+            "type": "string",
+            "value": "+1 (856) 386-7498"
+          }
+        ]
+      },
+      "transitions": [
+        {
+          "event": "next",
+          "next": "welcome_msg"
+        }
+      ],
+      "type": "set-variables"
+    }
+  ]
 }
