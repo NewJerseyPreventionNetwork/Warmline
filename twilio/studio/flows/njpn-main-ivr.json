@@ -1173,9 +1173,8 @@
           {
             "key": "API_BASE_URL",
             "type": "string",
-            "value": "https://njpn-7517.twil.io"
-          },
-          {
+            "value": "API_BASE_URL"
+          }
             "key": "HUBSPOT_NUMBER",
             "type": "string",
             "value": "+1 (856) 386-7498"
