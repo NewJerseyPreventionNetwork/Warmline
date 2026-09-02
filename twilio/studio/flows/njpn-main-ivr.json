@@ -232,7 +232,7 @@
           "conditions": [
             {
               "arguments": [
-                "{{widgets.check_hours.parsed.open}}"
+                "{{widgets.check_hours_english.parsed.open}}"
               ],
               "friendly_name": "If value equal_to true",
               "type": "equal_to",
