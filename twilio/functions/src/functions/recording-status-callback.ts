@@ -130,12 +130,14 @@ async function findCallEngagementWithRetry(
             const searchData = await searchResponse.json() as HubSpotSearchResponse;
 
             if (!searchResponse.ok) {
-                throw new Error(
+                const searchError = new Error(
                     `HubSpot search error (${searchResponse.status}): ${JSON.stringify(searchData)}`
                 );
-            }
-
-            if (searchData.results?.length) {
+                if (searchResponse.status < 500 && searchResponse.status !== 429) {
+                    throw searchError;
+                }
+                lastError = searchError;
+            } else if (searchData.results?.length) {
                 return parseInt(searchData.results[0].id, 10);
             }
 
@@ -149,11 +151,15 @@ async function findCallEngagementWithRetry(
         if (attempt < maxAttempts) {
             const delay = baseDelayMs * Math.pow(2, attempt - 1);
             await sleep(delay);
+        } else {
+            throw new Error(
+                `Could not find HubSpot call for CallSid ${callSid} after ${maxAttempts} attempts: ${lastError?.message}`
+            );
         }
     }
 
     throw new Error(
-        `Could not find HubSpot call for CallSid ${callSid} after ${maxAttempts} attempts: ${lastError?.message}`
+        `Could not find HubSpot call for CallSid ${callSid} after ${maxAttempts} attempts`
     );
 }
 
