@@ -21,8 +21,7 @@ export const handler = function(
     const hour = newJerseyTime.getHours();
 
     const isWeekday = day >= 1 && day <= 5;
-    const isOpen = isWeekday && hour >= 6 && hour < 16;
-
+    const isOpen = isWeekday && hour >= 9 && hour < 16;
     callback(null, {
         open: isOpen,
         currentTime: newJerseyTime.toISOString()
