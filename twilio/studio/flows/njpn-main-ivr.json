@@ -784,7 +784,7 @@
       "transitions": [
         {
           "event": "callCompleted",
-          "next": "say_play_2"
+          "next": "county_or_voicemail_select"
         },
         {
           "event": "hangup"
@@ -799,8 +799,8 @@
         "content_type": "application/x-www-form-urlencoded;charset=utf-8",
         "method": "GET",
         "offset": {
-          "x": -157,
-          "y": 1904
+          "x": -238,
+          "y": 2284
         },
         "parameters": [
           {
@@ -827,8 +827,8 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": 41,
-          "y": 2151
+          "x": 81,
+          "y": 2550
         },
         "say": "Sorry, we’re having trouble directing your call. You can access all our resources online at …"
       },
@@ -845,8 +845,8 @@
         "caller_id": "{{contact.channel.address}}",
         "noun": "number",
         "offset": {
-          "x": -445,
-          "y": 2168
+          "x": -296,
+          "y": 2551
         },
         "timeout": 30,
         "to": "{{widgets.lookup_county_number.parsed.number}}"
@@ -1261,7 +1261,7 @@
           "x": -2021,
           "y": 1496
         },
-        "recording_status_callback_url": "https://njpn-7517.twil.io/recording-status-callback",
+        "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback",
         "timeout": 5
       },
       "transitions": [
@@ -1284,10 +1284,10 @@
         "finish_on_key": "#",
         "max_length": 70,
         "offset": {
-          "x": -923,
-          "y": 2081
+          "x": -719,
+          "y": 2485
         },
-        "recording_status_callback_url": "https://njpn-7517.twil.io/recording-status-callback",
+        "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback",
         "timeout": 5
       },
       "transitions": [
@@ -1320,7 +1320,7 @@
             "value": "{{trigger.call.CallSid}}"
           }
         ],
-        "url": "https://njpn-7517.twil.io/log-call-to-hubspot"
+        "url": "{{widgets.set_variables.parsed.API_BASE_URL}}/log-call-to-hubspot"
       },
       "transitions": [
         {
@@ -1358,37 +1358,12 @@
       "type": "set-variables"
     },
     {
-      "name": "call_recording_1",
-      "properties": {
-        "offset": {
-          "x": -416,
-          "y": 2391
-        },
-        "record_call": true,
-        "recording_channels": "dual",
-        "recording_status_callback": "https://njpn-7517.twil.io/recording-status-callback",
-        "recording_status_callback_events": "completed",
-        "recording_status_callback_method": "POST",
-        "trim": "do-not-trim"
-      },
-      "transitions": [
-        {
-          "event": "success",
-          "next": "call_recording_1"
-        },
-        {
-          "event": "failed"
-        }
-      ],
-      "type": "record-call"
-    },
-    {
       "name": "say_play_1",
       "properties": {
         "loop": 1,
         "offset": {
-          "x": -824,
-          "y": 2336
+          "x": -726,
+          "y": 2673
         },
         "say": "Recording complete"
       },
@@ -1404,8 +1379,8 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": -899,
-          "y": 1885
+          "x": -718,
+          "y": 2298
         },
         "say": "Record voicemail"
       },
@@ -1451,6 +1426,69 @@
         }
       ],
       "type": "say-play"
+    },
+    {
+      "name": "county_or_voicemail_select",
+      "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en",
+        "language": "en-US",
+        "loop": 1,
+        "number_of_digits": 1,
+        "offset": {
+          "x": -510,
+          "y": 1868
+        },
+        "say": "Sorry, there are no representatives available right now. To try again, press 1. To leave a voicemail, press 2.",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
+      "transitions": [
+        {
+          "event": "keypress",
+          "next": "county_or_voicemail"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "type": "gather-input-on-call"
+    },
+    {
+      "name": "county_or_voicemail",
+      "properties": {
+        "input": "{{widgets.county_or_voicemail_select.Digits}}",
+        "offset": {
+          "x": -500,
+          "y": 2073
+        }
+      },
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "say_play_2"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.county_or_voicemail_select.Digits}}"
+              ],
+              "friendly_name": "If value equal_to 1",
+              "type": "equal_to",
+              "value": "1"
+            }
+          ],
+          "event": "match",
+          "next": "lookup_county_number"
+        }
+      ],
+      "type": "split-based-on"
     }
   ]
 }
