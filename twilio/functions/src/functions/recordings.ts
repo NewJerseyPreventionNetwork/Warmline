@@ -59,7 +59,7 @@ export const handler = async function(
                 externalAccountId: context.HUBSPOT_EXTERNAL_ACCOUNT_ID,
             },
             context.SHARED_SECRET,
-            { expiresIn: "1h" }
+            { expiresIn: "10m" }
         );
 
         callback(null, {

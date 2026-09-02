@@ -1,5 +1,5 @@
 type CountyEvent = { pin?: string };
-type CountyCallback = (error: Error | null, response: { county: string }) => void;
+type CountyCallback = (error: Error | null, response: { county: string, valid: boolean }) => void;
 
 export const handler = async function(
     _context: Record<string, string | undefined>,
@@ -33,12 +33,14 @@ export const handler = async function(
 
     const DEFAULT_COUNTY = "atlantic";
 
-    const givenCounty = (event.pin || "").toLowerCase().trim();
+    const givenCounty = (event.pin || "").trim();
 
     const countyName = countyMap[givenCounty];
+    const valid = countyName !== undefined;
 
     // Fall back to the default if the county wasn't found in the map, not just if it was empty
     callback(null, {
-        county: countyName || DEFAULT_COUNTY
+        county: countyName || DEFAULT_COUNTY,
+        valid
     });
 };

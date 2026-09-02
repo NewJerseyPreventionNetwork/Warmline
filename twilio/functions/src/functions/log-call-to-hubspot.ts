@@ -74,8 +74,6 @@ export const handler = async function(
             }
         );
 
-        console.log("hs_call_external_id", callSid);
-
         if (!response.ok) {
             throw new Error(await response.text());
         }
@@ -85,8 +83,6 @@ export const handler = async function(
         if (!hubspotCall.id) {
             throw new Error("HubSpot response did not include a call id");
         }
-
-        console.log("Created HubSpot Call:", hubspotCall.id);
 
         callback(null, {
             success: true,
