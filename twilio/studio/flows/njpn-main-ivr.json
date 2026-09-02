@@ -232,7 +232,7 @@
           "conditions": [
             {
               "arguments": [
-                "{{widgets.check_hours_english.parsed.open}}"
+                "{{widgets.check_hours.parsed.open}}"
               ],
               "friendly_name": "If value equal_to true",
               "type": "equal_to",
@@ -575,9 +575,10 @@
           "next": "counter_add1_spa"
         },
         {
+          "conditions": [
             {
               "arguments": [
-                "{{widgets.validateCountySpanish.parsed.valid}}"
+                "{{widgets.validateCounty.parsed.valid}}"
               ],
               "friendly_name": "If value equal_to true",
               "type": "equal_to",
@@ -1173,8 +1174,9 @@
           {
             "key": "API_BASE_URL",
             "type": "string",
-            "value": "API_BASE_URL"
-          }
+            "value": "https://njpn-7517.twil.io"
+          },
+          {
             "key": "HUBSPOT_NUMBER",
             "type": "string",
             "value": "+1 (856) 386-7498"
