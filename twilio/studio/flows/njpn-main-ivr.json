@@ -575,10 +575,9 @@
           "next": "counter_add1_spa"
         },
         {
-          "conditions": [
             {
               "arguments": [
-                "{{widgets.validateCounty.parsed.valid}}"
+                "{{widgets.validateCountySpanish.parsed.valid}}"
               ],
               "friendly_name": "If value equal_to true",
               "type": "equal_to",
