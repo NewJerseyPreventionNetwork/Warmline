@@ -210,6 +210,18 @@ async function markRecordingReadyWithRetry(
 async function getHubSpotAccessToken(
     context: RuntimeContext
 ): Promise<string> {
+    if (!context.HUBSPOT_CLIENT_ID) {
+        throw new Error("Missing HUBSPOT_CLIENT_ID");
+    }
+
+    if (!context.HUBSPOT_CLIENT_SECRET) {
+        throw new Error("Missing HUBSPOT_CLIENT_SECRET");
+    }
+
+    if (!context.HUBSPOT_REFRESH_TOKEN) {
+        throw new Error("Missing HUBSPOT_REFRESH_TOKEN");
+    }
+
     const response = await fetch(
         "https://api.hubapi.com/oauth/v1/token",
         {
@@ -217,9 +229,9 @@ async function getHubSpotAccessToken(
             headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: new URLSearchParams({
                 grant_type: "refresh_token",
-                client_id: context.HUBSPOT_CLIENT_ID || "",
-                client_secret: context.HUBSPOT_CLIENT_SECRET || "",
-                refresh_token: context.HUBSPOT_REFRESH_TOKEN || ""
+                client_id: context.HUBSPOT_CLIENT_ID,
+                client_secret: context.HUBSPOT_CLIENT_SECRET,
+                refresh_token: context.HUBSPOT_REFRESH_TOKEN
             })
         }
     );

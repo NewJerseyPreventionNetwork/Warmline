@@ -56,6 +56,14 @@ export const handler = async function(
             throw new Error("Missing SHARED_SECRET");
         }
 
+        if (!context.ACCOUNT_SID) {
+            throw new Error("Missing ACCOUNT_SID");
+        }
+
+        if (!context.AUTH_TOKEN) {
+            throw new Error("Missing AUTH_TOKEN");
+        }
+
         const payload = jwt.verify(event.jwt, context.SHARED_SECRET) as {
             externalId?: string;
             appId?: string;
