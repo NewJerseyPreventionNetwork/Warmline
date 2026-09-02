@@ -41,13 +41,20 @@ export const handler = async function(
             throw new Error("Invalid externalId");
         }
 
-        if (
-            !context.SHARED_SECRET ||
-            !context.DOMAIN_NAME ||
-            !context.HUBSPOT_APP_ID ||
-            !context.HUBSPOT_EXTERNAL_ACCOUNT_ID
-        ) {
-            throw new Error("Missing required HubSpot/Twilio configuration");
+        if (!context.SHARED_SECRET) {
+            throw new Error("Missing SHARED_SECRET");
+        }
+
+        if (!context.DOMAIN_NAME) {
+            throw new Error("Missing DOMAIN_NAME");
+        }
+
+        if (!context.HUBSPOT_APP_ID) {
+            throw new Error("Missing HUBSPOT_APP_ID");
+        }
+
+        if (!context.HUBSPOT_EXTERNAL_ACCOUNT_ID) {
+            throw new Error("Missing HUBSPOT_EXTERNAL_ACCOUNT_ID");
         }
 
         await context.getTwilioClient().calls(externalId).fetch();
