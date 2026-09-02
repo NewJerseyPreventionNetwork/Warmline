@@ -7,6 +7,11 @@ declare namespace Twilio {
 }
 
 type RuntimeContext = {
+    getTwilioClient: () => {
+        calls: (callSid: string) => {
+            recordings: (recordingSid: string) => { fetch: () => Promise<unknown> };
+        };
+    };
     HUBSPOT_CLIENT_ID?: string;
     HUBSPOT_CLIENT_SECRET?: string;
     HUBSPOT_REFRESH_TOKEN?: string;
@@ -36,13 +41,21 @@ export const handler = async function(
 ) {
     try {
         const callSid = event.CallSid;
-        if (!callSid) throw new Error("Missing CallSid");
+        if (!callSid || !/^CA[0-9a-fA-F]{32}$/.test(callSid)) {
+            throw new Error("Invalid CallSid");
+        }
 
         const recordingSid = event.RecordingSid;
 
-        if (!recordingSid) {
-            throw new Error("Missing RecordingSid");
+        if (!recordingSid || !/^RE[0-9a-fA-F]{32}$/.test(recordingSid)) {
+            throw new Error("Invalid RecordingSid");
         }
+
+        await context
+            .getTwilioClient()
+            .calls(callSid)
+            .recordings(recordingSid)
+            .fetch();
 
         const accessToken = await getHubSpotAccessToken(context);
 
@@ -152,8 +165,9 @@ async function markRecordingReadyWithRetry(
     let lastError: Error | undefined;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        let readyResponse: Response;
         try {
-            const readyResponse = await fetch(
+            readyResponse = await fetch(
                 "https://api.hubapi.com/crm/extensions/calling/2026-03/recordings/ready",
                 {
                     method: "POST",
@@ -165,18 +179,23 @@ async function markRecordingReadyWithRetry(
                 }
             );
 
-            if (readyResponse.status === 204) {
-                return;
-            }
-
-            const errBody = await readyResponse.text();
-            lastError = new Error(`markAsReady failed (${readyResponse.status}): ${errBody}`);
-
-            if (readyResponse.status < 500 && readyResponse.status !== 429) {
-                throw lastError;
-            }
         } catch (err) {
             lastError = err instanceof Error ? err : new Error(String(err));
+            if (attempt === maxAttempts) throw lastError;
+            const delay = baseDelayMs * Math.pow(2, attempt - 1);
+            await sleep(delay);
+            continue;
+        }
+
+        if (readyResponse.status === 204) {
+            return;
+        }
+
+        const errBody = await readyResponse.text();
+        lastError = new Error(`markAsReady failed (${readyResponse.status}): ${errBody}`);
+
+        if (readyResponse.status < 500 && readyResponse.status !== 429) {
+            throw lastError;
         }
 
         if (attempt < maxAttempts) {
@@ -227,10 +246,12 @@ async function updateCallCompleted(
         hs_call_status: "COMPLETED",
     };
 
-    if (recordingDurationSeconds) {
-        properties.hs_call_duration = String(
-            Number(recordingDurationSeconds) * 1000
-        );
+    if (recordingDurationSeconds !== undefined) {
+        const durationSeconds = Number(recordingDurationSeconds);
+        if (!Number.isFinite(durationSeconds) || durationSeconds < 0) {
+            throw new Error("Invalid RecordingDuration");
+        }
+        properties.hs_call_duration = String(durationSeconds * 1000);
     }
 
     const response = await fetch(

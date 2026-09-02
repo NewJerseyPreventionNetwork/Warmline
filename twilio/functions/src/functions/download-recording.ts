@@ -19,6 +19,8 @@ type TwilioClient = {
 type RuntimeContext = {
     ACCOUNT_SID?: string;
     AUTH_TOKEN?: string;
+    HUBSPOT_APP_ID?: string;
+    HUBSPOT_EXTERNAL_ACCOUNT_ID?: string;
     SHARED_SECRET?: string;
     getTwilioClient: () => TwilioClient;
 };
@@ -41,6 +43,7 @@ export const handler = async function(
     event: DownloadEvent,
     callback: DownloadCallback
 ) {
+    try {
         if (!event.jwt) {
             const response = new Twilio.Response();
             response.setStatusCode(401);
@@ -55,16 +58,29 @@ export const handler = async function(
 
         const payload = jwt.verify(event.jwt, context.SHARED_SECRET) as {
             externalId?: string;
+            appId?: string;
+            externalAccountId?: string;
         };
 
         const callSid = payload.externalId;
-        if (!callSid) {
+        if (
+            !callSid ||
+            !/^CA[0-9a-fA-F]{32}$/.test(callSid) ||
+            payload.appId !== context.HUBSPOT_APP_ID ||
+            payload.externalAccountId !== context.HUBSPOT_EXTERNAL_ACCOUNT_ID
+        ) {
             const response = new Twilio.Response();
             response.setStatusCode(401);
             response.appendHeader("Content-Type", "application/json");
             response.setBody({ error: "Invalid token" });
             return callback(null, response);
         }
+
+        const recordings = await context
+            .getTwilioClient()
+            .calls(callSid)
+            .recordings
+            .list();
 
         if (!recordings.length) {
             const response = new Twilio.Response();

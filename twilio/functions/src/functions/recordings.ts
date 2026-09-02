@@ -8,7 +8,11 @@ declare namespace Twilio {
     }
 }
 
-type RuntimeContext = Record<string, string | undefined>;
+type RuntimeContext = Record<string, string | undefined> & {
+    getTwilioClient: () => {
+        calls: (callSid: string) => { fetch: () => Promise<unknown> };
+    };
+};
 type RecordingEvent = {
     externalId?: string;
     jwt?: string;
@@ -33,9 +37,18 @@ export const handler = async function(
     try {
         const externalId = event.externalId;
 
-        if (!externalId) {
+        if (
+            !externalId ||
+            !/^CA[0-9a-fA-F]{32}$/.test(externalId) ||
+            !context.SHARED_SECRET ||
+            !context.DOMAIN_NAME ||
+            !context.HUBSPOT_APP_ID ||
+            !context.HUBSPOT_EXTERNAL_ACCOUNT_ID
+        ) {
             throw new Error(`Missing externalId: ${JSON.stringify(event)}`);
         }
+
+        await context.getTwilioClient().calls(externalId).fetch();
 
         const token = jwt.sign(
             {

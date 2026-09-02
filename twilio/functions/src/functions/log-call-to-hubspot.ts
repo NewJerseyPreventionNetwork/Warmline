@@ -12,6 +12,9 @@ type RuntimeContext = {
     HUBSPOT_CLIENT_SECRET?: string;
     HUBSPOT_EXTERNAL_ACCOUNT_ID?: string;
     HUBSPOT_REFRESH_TOKEN?: string;
+    getTwilioClient: () => {
+        calls: (callSid: string) => { fetch: () => Promise<unknown> };
+    };
 };
 type CallEvent = { CallSid?: string };
 type HubSpotCallResponse = { id?: string };
@@ -34,9 +37,16 @@ export const handler = async function(
     try {
         const callSid = event.CallSid;
 
-        if (!callSid) {
+        if (
+            !callSid ||
+            !/^CA[0-9a-fA-F]{32}$/.test(callSid) ||
+            !context.HUBSPOT_APP_ID ||
+            !context.HUBSPOT_EXTERNAL_ACCOUNT_ID
+        ) {
             throw new Error("Missing CallSid");
         }
+
+        await context.getTwilioClient().calls(callSid).fetch();
 
         const accessToken = await getHubSpotAccessToken(context);
 
@@ -71,6 +81,10 @@ export const handler = async function(
         }
 
         const hubspotCall = await response.json() as HubSpotCallResponse;
+
+        if (!hubspotCall.id) {
+            throw new Error("HubSpot response did not include a call id");
+        }
 
         console.log("Created HubSpot Call:", hubspotCall.id);
 
