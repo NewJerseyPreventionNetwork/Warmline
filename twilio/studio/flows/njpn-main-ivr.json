@@ -9,8 +9,8 @@
       "name": "Trigger",
       "properties": {
         "offset": {
-          "x": 828,
-          "y": -862
+          "x": 808,
+          "y": -1245
         }
       },
       "transitions": [
@@ -39,10 +39,10 @@
         "language": "en-US",
         "loop": 1,
         "offset": {
-          "x": 1259,
-          "y": -322
+          "x": 1056,
+          "y": -332
         },
-        "say": "Thank you for calling the New Jersey Prevention Hub Warm Line. If this is an emergency, please hang up and dial 911."
+        "play": "https://njpn-7517.twil.io/opening-message.mp3"
       },
       "transitions": [
         {
@@ -57,14 +57,13 @@
       "properties": {
         "finish_on_key": "#",
         "gather_language": "en",
-        "language": "es-US",
         "loop": 1,
         "number_of_digits": 1,
         "offset": {
           "x": 1168,
           "y": 67
         },
-        "say": "Para escuchar en español, pulsa el 2",
+        "play": "https://njpn-7517.twil.io/select-spanish.mp3",
         "speech_model": "default",
         "speech_timeout": "5",
         "stop_gather": false,
@@ -247,23 +246,6 @@
       "type": "split-based-on"
     },
     {
-      "name": "closed_message_english",
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -1411,
-          "y": 849
-        },
-        "say": "Thank you for calling the New Jersey Prevention Hub Warm Line. If this is an emergency, please hang up and dial 911. Warm Line hours are 9AM to 4PM. For immediate resource assistance, visit www.gethelpnj.org. To hear this message again, press 1. To leave a voicemail for a Warm Line representative, press 2."
-      },
-      "transitions": [
-        {
-          "event": "audioComplete"
-        }
-      ],
-      "type": "say-play"
-    },
-    {
       "name": "validateCounty",
       "properties": {
         "add_twilio_auth": false,
@@ -332,7 +314,7 @@
           "x": -1108,
           "y": 986
         },
-        "say": "Sorry, we couldn’t find that county, please try again"
+        "play": "https://njpn-7517.twil.io/try-again-voice.mp3"
       },
       "transitions": [
         {
@@ -672,7 +654,7 @@
           "x": 1508,
           "y": 2220
         },
-        "say": "Lo sentimos, no hemos podido encontrar ese condado. Inténtalo de nuevo, por favor."
+        "play": "https://njpn-7517.twil.io/try-again-voice-spa.mp3"
       },
       "transitions": [
         {
@@ -691,7 +673,7 @@
           "x": 704,
           "y": -123
         },
-        "say": "If you’d like to continue in English, press 1."
+        "play": "https://njpn-7517.twil.io/select-english.mp3"
       },
       "transitions": [
         {
@@ -803,7 +785,7 @@
       "transitions": [
         {
           "event": "callCompleted",
-          "next": "lookup_county_number"
+          "next": "say_play_2"
         },
         {
           "event": "hangup"
@@ -1185,8 +1167,8 @@
       "name": "set_variables",
       "properties": {
         "offset": {
-          "x": 983,
-          "y": -599
+          "x": 1002,
+          "y": -1050
         },
         "variables": [
           {
@@ -1204,10 +1186,273 @@
       "transitions": [
         {
           "event": "next",
+          "next": "log_call_to_hubspot"
+        }
+      ],
+      "type": "set-variables"
+    },
+    {
+      "name": "closed_message_english",
+      "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en",
+        "language": "en-US",
+        "loop": 1,
+        "number_of_digits": 1,
+        "offset": {
+          "x": -1512,
+          "y": 827
+        },
+        "say": "Thank you for calling the New Jersey Prevention Hub Warm Line. If this is an emergency, please hang up and dial 911. Warm Line hours are 9AM to 4PM. For immediate resource assistance, visit www.gethelpnj.org. To hear this message again, press 1. To leave a voicemail for a Warm Line representative, press 2.",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
+      "transitions": [
+        {
+          "event": "keypress",
+          "next": "repeat_or_voicemail"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "type": "gather-input-on-call"
+    },
+    {
+      "name": "repeat_or_voicemail",
+      "properties": {
+        "input": "{{widgets.closed_message_english.Digits}}",
+        "offset": {
+          "x": -1682,
+          "y": 1084
+        }
+      },
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "Copy_of_say_play_2"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.closed_message_english.Digits}}"
+              ],
+              "friendly_name": "If value equal_to 1",
+              "type": "equal_to",
+              "value": "1"
+            }
+          ],
+          "event": "match",
+          "next": "closed_message_english"
+        }
+      ],
+      "type": "split-based-on"
+    },
+    {
+      "name": "closed_voicemail",
+      "properties": {
+        "finish_on_key": "#",
+        "max_length": 70,
+        "offset": {
+          "x": -2021,
+          "y": 1496
+        },
+        "recording_status_callback_url": "https://njpn-7517.twil.io/recording-status-callback",
+        "timeout": 5
+      },
+      "transitions": [
+        {
+          "event": "recordingComplete",
+          "next": "Copy_of_say_play_1"
+        },
+        {
+          "event": "noAudio"
+        },
+        {
+          "event": "hangup"
+        }
+      ],
+      "type": "record-voicemail"
+    },
+    {
+      "name": "voicemail_no_response",
+      "properties": {
+        "finish_on_key": "#",
+        "max_length": 70,
+        "offset": {
+          "x": -923,
+          "y": 2081
+        },
+        "recording_status_callback_url": "https://njpn-7517.twil.io/recording-status-callback",
+        "timeout": 5
+      },
+      "transitions": [
+        {
+          "event": "recordingComplete",
+          "next": "say_play_1"
+        },
+        {
+          "event": "noAudio"
+        },
+        {
+          "event": "hangup"
+        }
+      ],
+      "type": "record-voicemail"
+    },
+    {
+      "name": "log_call_to_hubspot",
+      "properties": {
+        "add_twilio_auth": false,
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "POST",
+        "offset": {
+          "x": 827,
+          "y": -795
+        },
+        "parameters": [
+          {
+            "key": "CallSid",
+            "value": "{{trigger.call.CallSid}}"
+          }
+        ],
+        "url": "https://njpn-7517.twil.io/log-call-to-hubspot"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "store_hubspot_call_id"
+        },
+        {
+          "event": "failed",
+          "next": "welcome_msg"
+        }
+      ],
+      "type": "make-http-request"
+    },
+    {
+      "name": "store_hubspot_call_id",
+      "properties": {
+        "offset": {
+          "x": 576,
+          "y": -524
+        },
+        "variables": [
+          {
+            "key": "hubspot_call_id",
+            "type": "string",
+            "value": "{{widgets.log_call_to_hubspot.parsed.hubspotCallId}}"
+          }
+        ]
+      },
+      "transitions": [
+        {
+          "event": "next",
           "next": "welcome_msg"
         }
       ],
       "type": "set-variables"
+    },
+    {
+      "name": "call_recording_1",
+      "properties": {
+        "offset": {
+          "x": -416,
+          "y": 2391
+        },
+        "record_call": true,
+        "recording_channels": "dual",
+        "recording_status_callback": "https://njpn-7517.twil.io/recording-status-callback",
+        "recording_status_callback_events": "completed",
+        "recording_status_callback_method": "POST",
+        "trim": "do-not-trim"
+      },
+      "transitions": [
+        {
+          "event": "success",
+          "next": "call_recording_1"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "type": "record-call"
+    },
+    {
+      "name": "say_play_1",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -824,
+          "y": 2336
+        },
+        "say": "Recording complete"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "say_play_2",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -899,
+          "y": 1885
+        },
+        "say": "Record voicemail"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "voicemail_no_response"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "Copy_of_say_play_2",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -2025,
+          "y": 1313
+        },
+        "say": "Record voicemail"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "closed_voicemail"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "Copy_of_say_play_1",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -2025,
+          "y": 1687
+        },
+        "say": "Recording complete"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
     }
   ]
 }
