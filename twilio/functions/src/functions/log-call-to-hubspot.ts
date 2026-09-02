@@ -95,7 +95,7 @@ export const handler = async function(
 
 async function getHubSpotAccessToken(
     context: RuntimeContext
-): Promise<string | undefined> {
+): Promise<string> {
     const response = await fetch(
         "https://api.hubapi.com/oauth/v1/token",
         {
@@ -117,5 +117,10 @@ async function getHubSpotAccessToken(
     }
 
     const data = await response.json() as AccessTokenResponse;
+
+    if (!data.access_token) {
+        throw new Error("Token refresh response did not include an access token");
+    }
+
     return data.access_token;
 }
