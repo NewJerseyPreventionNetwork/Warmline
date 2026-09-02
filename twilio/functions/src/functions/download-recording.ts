@@ -41,17 +41,30 @@ export const handler = async function(
     event: DownloadEvent,
     callback: DownloadCallback
 ) {
-    try {
-        const payload = jwt.verify(
-            event.jwt,
-            context.SHARED_SECRET
-        );
+        if (!event.jwt) {
+            const response = new Twilio.Response();
+            response.setStatusCode(401);
+            response.appendHeader("Content-Type", "application/json");
+            response.setBody({ error: "Missing token" });
+            return callback(null, response);
+        }
+
+        if (!context.SHARED_SECRET) {
+            throw new Error("Missing SHARED_SECRET");
+        }
+
+        const payload = jwt.verify(event.jwt, context.SHARED_SECRET) as {
+            externalId?: string;
+        };
 
         const callSid = payload.externalId;
-
-        const client = context.getTwilioClient();
-
-        const recordings = await client.calls(callSid).recordings.list();
+        if (!callSid) {
+            const response = new Twilio.Response();
+            response.setStatusCode(401);
+            response.appendHeader("Content-Type", "application/json");
+            response.setBody({ error: "Invalid token" });
+            return callback(null, response);
+        }
 
         if (!recordings.length) {
             const response = new Twilio.Response();
