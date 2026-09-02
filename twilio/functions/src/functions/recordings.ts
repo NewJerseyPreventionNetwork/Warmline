@@ -37,15 +37,17 @@ export const handler = async function(
     try {
         const externalId = event.externalId;
 
+        if (!externalId || !/^CA[0-9a-fA-F]{32}$/.test(externalId)) {
+            throw new Error("Invalid externalId");
+        }
+
         if (
-            !externalId ||
-            !/^CA[0-9a-fA-F]{32}$/.test(externalId) ||
             !context.SHARED_SECRET ||
             !context.DOMAIN_NAME ||
             !context.HUBSPOT_APP_ID ||
             !context.HUBSPOT_EXTERNAL_ACCOUNT_ID
         ) {
-            throw new Error(`Missing externalId: ${JSON.stringify(event)}`);
+            throw new Error("Missing required HubSpot/Twilio configuration");
         }
 
         await context.getTwilioClient().calls(externalId).fetch();
