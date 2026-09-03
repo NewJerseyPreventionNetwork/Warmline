@@ -1,11 +1,13 @@
-type RuntimeContext = Record<string, string | undefined>;
 type CountyEvent = { county?: string };
-type CountyCallback = (error: Error | null, response: { number: string | undefined }) => void;
+type NumberCallback = (
+    error: Error | null,
+    response: { number: string | undefined }
+) => void;
 
 export const handler = async function(
-    context: RuntimeContext,
+    context: Record<string, string | undefined>,
     event: CountyEvent,
-    callback: CountyCallback
+    callback: NumberCallback
 ) {
 
     const countyMap: Record<string, string | undefined> = {
@@ -30,10 +32,9 @@ export const handler = async function(
         "sussex": context.SUSSEX_NUMBER,
         "union": context.UNION_NUMBER,
         "warren": context.WARREN_NUMBER,
-        "cabo may": context.CAPE_MAY_NUMBER
+        "cabo may": context.CAPE_MAY_NUMBER,
+        "representative": context.REPRESENTATIVE_NUMBER
     };
-
-    const DEFAULT_NUMBER = context.DEFAULT_NUMBER;
 
     const spokenCounty = (event.county || "").toLowerCase().trim();
 
@@ -44,6 +45,6 @@ export const handler = async function(
     console.log("assignedNumber:", assignedNumber);
 
     callback(null, {
-        number: assignedNumber || DEFAULT_NUMBER
+        number: assignedNumber
     });
 };
