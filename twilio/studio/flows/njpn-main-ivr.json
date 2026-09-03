@@ -730,7 +730,7 @@
         },
         {
           "event": "failed",
-          "next": "say_play_3"
+          "next": "connect_failed_spanish"
         }
       ],
       "type": "make-http-request"
@@ -754,7 +754,7 @@
       "type": "say-play"
     },
     {
-      "name": "say_play_3",
+      "name": "connect_failed_spanish",
       "properties": {
         "loop": 1,
         "offset": {
@@ -814,17 +814,17 @@
       "transitions": [
         {
           "event": "success",
-          "next": "Copy_of_connect_to_county"
+          "next": "connect_to_county"
         },
         {
           "event": "failed",
-          "next": "Copy_of_say_play_3"
+          "next": "connect_failed"
         }
       ],
       "type": "make-http-request"
     },
     {
-      "name": "Copy_of_say_play_3",
+      "name": "connect_failed",
       "properties": {
         "loop": 1,
         "offset": {
@@ -841,7 +841,7 @@
       "type": "say-play"
     },
     {
-      "name": "Copy_of_connect_to_county",
+      "name": "connect_to_county",
       "properties": {
         "caller_id": "{{contact.channel.address}}",
         "noun": "number",
@@ -1070,7 +1070,7 @@
         },
         {
           "event": "failed",
-          "next": "lookup_failed_spanish"
+          "next": "connect_failed_spanish"
         }
       ],
       "type": "make-http-request"
@@ -1101,7 +1101,7 @@
         },
         {
           "event": "failed",
-          "next": "lookup_failed_spanish"
+          "next": "connect_failed_spanish"
         }
       ],
       "type": "make-http-request"
@@ -1253,7 +1253,7 @@
       "transitions": [
         {
           "event": "recordingComplete",
-          "next": "Copy_of_say_play_1"
+          "next": "recording_complete_closed"
         },
         {
           "event": "noAudio"
@@ -1279,7 +1279,7 @@
       "transitions": [
         {
           "event": "recordingComplete",
-          "next": "say_play_1"
+          "next": "recording_complete"
         },
         {
           "event": "noAudio"
@@ -1344,7 +1344,7 @@
       "type": "set-variables"
     },
     {
-      "name": "say_play_1",
+      "name": "recording_complete",
       "properties": {
         "loop": 1,
         "offset": {
@@ -1397,7 +1397,7 @@
       "type": "say-play"
     },
     {
-      "name": "Copy_of_say_play_1",
+      "name": "recording_complete_closed",
       "properties": {
         "loop": 1,
         "offset": {
@@ -1580,7 +1580,7 @@
       "type": "say-play"
     },
     {
-      "name": "say_play_2",
+      "name": "recording_complete_no_response",
       "properties": {
         "loop": 1,
         "offset": {
@@ -1703,7 +1703,7 @@
       "transitions": [
         {
           "event": "recordingComplete",
-          "next": "say_play_2"
+          "next": "recording_complete_no_response"
         },
         {
           "event": "noAudio"

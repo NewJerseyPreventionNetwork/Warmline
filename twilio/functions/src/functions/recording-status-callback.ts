@@ -102,6 +102,8 @@ async function findCallEngagementWithRetry(
     let lastError: Error | undefined;
 
     for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        let nonRetryableError: Error | undefined;
+
         try {
             const searchResponse = await fetch(
                 "https://api.hubapi.com/crm/objects/2026-03/calls/search",
@@ -134,9 +136,10 @@ async function findCallEngagementWithRetry(
                     `HubSpot search error (${searchResponse.status}): ${JSON.stringify(searchData)}`
                 );
                 if (searchResponse.status < 500 && searchResponse.status !== 429) {
-                    throw searchError;
+                    nonRetryableError = searchError;
+                } else {
+                    lastError = searchError;
                 }
-                lastError = searchError;
             } else if (searchData.results?.length) {
                 return parseInt(searchData.results[0].id, 10);
             }
@@ -146,6 +149,10 @@ async function findCallEngagementWithRetry(
             );
         } catch (err) {
             lastError = err instanceof Error ? err : new Error(String(err));
+        }
+
+        if (nonRetryableError) {
+            throw nonRetryableError;
         }
 
         if (attempt < maxAttempts) {
