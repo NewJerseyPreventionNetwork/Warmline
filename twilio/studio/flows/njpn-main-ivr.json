@@ -148,7 +148,7 @@
           "y": 1496
         },
         "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback",
-        "timeout": 5
+        "timeout": 60
       }
     },
     {
@@ -190,24 +190,6 @@
           "y": 1988
         },
         "say": "Conectándole con su condado."
-      }
-    },
-    {
-      "name": "connect_to_county",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete",
-          "next": "send_to_county"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -1939,
-          "y": 2706
-        },
-        "say": "You are calling from {{widgets.map_county.parsed.county}} county. Connecting you to your county."
       }
     },
     {
@@ -291,24 +273,6 @@
       }
     },
     {
-      "name": "Copy_of_say_play_2",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete",
-          "next": "closed_voicemail"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -2025,
-          "y": 1313
-        },
-        "say": "Record voicemail"
-      }
-    },
-    {
       "name": "Copy_of_say_play_3",
       "type": "say-play",
       "transitions": [
@@ -383,7 +347,8 @@
           "event": "speech"
         },
         {
-          "event": "timeout"
+          "event": "timeout",
+          "next": "digits_counter_add"
         }
       ],
       "properties": {
@@ -392,8 +357,8 @@
         "language": "en-US",
         "loop": 1,
         "offset": {
-          "x": -1707,
-          "y": 2058
+          "x": -1703,
+          "y": 2105
         },
         "say": "Please enter the first 3 letters of your county, each letter as a single digit. For example, the first 3 digits of Atlantic are ATL, so the number would be 285.",
         "speech_model": "default",
@@ -439,7 +404,7 @@
       "transitions": [
         {
           "event": "noMatch",
-          "next": "say_play_2"
+          "next": "voicemail_message"
         },
         {
           "event": "match",
@@ -531,6 +496,60 @@
           "y": 2220
         },
         "play": "https://njpn-7517.twil.io/try-again-voice-spa.mp3"
+      }
+    },
+    {
+      "name": "digit_tries_left",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "send_to_county"
+        },
+        {
+          "event": "match",
+          "next": "county_areas",
+          "conditions": [
+            {
+              "friendly_name": "If value less_than 6",
+              "arguments": [
+                "{{flow.variables.digit_counter}}"
+              ],
+              "type": "less_than",
+              "value": "6"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{flow.variables.counter}}",
+        "offset": {
+          "x": -2676,
+          "y": 3035
+        }
+      }
+    },
+    {
+      "name": "digits_counter_add",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "event": "next",
+          "next": "digit_tries_left"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -2692,
+          "y": 2842
+        },
+        "variables": [
+          {
+            "key": "counter",
+            "type": "string",
+            "value": "{{flow.variables.counter| plus: 1}}"
+          }
+        ]
       }
     },
     {
@@ -822,7 +841,7 @@
       "transitions": [
         {
           "event": "success",
-          "next": "connect_to_county"
+          "next": "connect_call_hubspot"
         },
         {
           "event": "failed",
@@ -835,8 +854,8 @@
         "content_type": "application/x-www-form-urlencoded;charset=utf-8",
         "method": "GET",
         "offset": {
-          "x": -1595,
-          "y": 2489
+          "x": -1796,
+          "y": 2975
         },
         "parameters": [
           {
@@ -950,8 +969,8 @@
         "language": "en-US",
         "loop": 1,
         "offset": {
-          "x": -1141,
-          "y": 2692
+          "x": -1448,
+          "y": 3396
         },
         "say": "Sorry, we’re having trouble directing your call. You can access all our resources online at …"
       }
@@ -980,7 +999,7 @@
       "transitions": [
         {
           "event": "success",
-          "next": "lookup_county_from_digit"
+          "next": "split_1"
         },
         {
           "event": "failed",
@@ -992,8 +1011,8 @@
         "content_type": "application/x-www-form-urlencoded;charset=utf-8",
         "method": "GET",
         "offset": {
-          "x": -1297,
-          "y": 2278
+          "x": -2162,
+          "y": 2312
         },
         "parameters": [
           {
@@ -1040,7 +1059,7 @@
       "transitions": [
         {
           "event": "noMatch",
-          "next": "Copy_of_say_play_2"
+          "next": "voicemail_message_2"
         },
         {
           "event": "match",
@@ -1102,24 +1121,6 @@
       }
     },
     {
-      "name": "say_play_2",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete",
-          "next": "voicemail_no_response"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -718,
-          "y": 2298
-        },
-        "say": "Record voicemail"
-      }
-    },
-    {
       "name": "say_play_3",
       "type": "say-play",
       "transitions": [
@@ -1151,11 +1152,11 @@
         "caller_id": "{{contact.channel.address}}",
         "noun": "number",
         "offset": {
-          "x": -1934,
-          "y": 2906
+          "x": -2828,
+          "y": 3269
         },
         "timeout": 30,
-        "to": "{{widgets.lookup_county_from_digit.parsed.number}}"
+        "to": "{{flow.variables.HUBSPOT_NUMBER}}"
       }
     },
     {
@@ -1252,6 +1253,37 @@
             "value": "+1 (856) 386-7498"
           }
         ]
+      }
+    },
+    {
+      "name": "split_1",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "digits_counter_add"
+        },
+        {
+          "event": "match",
+          "next": "lookup_county_from_digit",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{widgets.map_county.parsed.valid}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{widgets.map_county.parsed.valid}}",
+        "offset": {
+          "x": -2390,
+          "y": 2634
+        }
       }
     },
     {
@@ -1444,6 +1476,42 @@
       }
     },
     {
+      "name": "voicemail_message",
+      "type": "say-play",
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "voicemail_no_response"
+        }
+      ],
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -718,
+          "y": 2298
+        },
+        "say": "Your message will begin recording after the beep. Press # when you’re finished, or the recording will stop automatically after one minute."
+      }
+    },
+    {
+      "name": "voicemail_message_2",
+      "type": "say-play",
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "closed_voicemail"
+        }
+      ],
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -2025,
+          "y": 1313
+        },
+        "say": "Your message will begin recording after the beep. Press # when you’re finished, or the recording will stop automatically after one minute."
+      }
+    },
+    {
       "name": "voicemail_no_response",
       "type": "record-voicemail",
       "transitions": [
@@ -1466,7 +1534,7 @@
           "y": 2485
         },
         "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback",
-        "timeout": 5
+        "timeout": 60
       }
     },
     {
