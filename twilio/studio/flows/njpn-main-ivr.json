@@ -220,17 +220,19 @@
         }
       ],
       "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en-US",
         "loop": 1,
         "offset": {
           "x": 107,
           "y": 2796
         },
-        "play": "https://njpn-7517.twil.io/send_to_website.mp3"
-      }
-    },
-    {
-      "name": "connect_failed_spanish",
-      "type": "say-play",
+        "play": "https://njpn-7517.twil.io/gather_county_spanish.mp3",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
       "transitions": [
         {
           "event": "audioComplete"
@@ -250,8 +252,12 @@
       "type": "say-play",
       "transitions": [
         {
-          "event": "audioComplete",
-          "next": "connect_to_county_spanish"
+          "event": "success",
+          "next": "is_open_english"
+        },
+        {
+          "event": "failed",
+          "next": "check_failed"
         }
       ],
       "properties": {
@@ -531,28 +537,18 @@
       "type": "say-play",
       "transitions": [
         {
-          "event": "audioComplete",
-          "next": "gather_county"
+          "event": "success",
+          "next": "is_open_spanish"
+        },
+        {
+          "event": "failed",
+          "next": "check_failed"
         }
       ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -1108,
-          "y": 986
-        },
-        "play": "https://njpn-7517.twil.io/try-again-voice.mp3"
-      }
+      "type": "make-http-request"
     },
     {
-      "name": "countyTryAgainMsg_spa",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete",
-          "next": "gather_county_spanish"
-        }
-      ],
+      "name": "is_open_spanish",
       "properties": {
         "language": "es-US",
         "loop": 1,
@@ -673,16 +669,8 @@
           "x": 2129,
           "y": 1084
         },
-        "say": "Para conectarte con los recursos cercanos, por favor di el nombre de tu condado. Si no estás seguro de en qué condado te encuentras, di \"representante\".",
-        "speech_model": "default",
-        "speech_timeout": "5",
-        "stop_gather": false,
-        "timeout": 5
-      }
-    },
-    {
-      "name": "gather_language",
-      "type": "gather-input-on-call",
+        "play": "https://njpn-7517.twil.io/send_to_website_spanish.mp3"
+      },
       "transitions": [
         {
           "event": "keypress",
@@ -879,12 +867,8 @@
           "x": -241,
           "y": 1392
         },
-        "play": "https://njpn-7517.twil.io/send_to_website.mp3"
-      }
-    },
-    {
-      "name": "log_functionFail2",
-      "type": "say-play",
+        "play": "https://njpn-7517.twil.io/connect_to_county_message_spanish.mp3"
+      },
       "transitions": [
         {
           "event": "audioComplete"
@@ -896,12 +880,8 @@
           "x": 2245,
           "y": 1468
         },
-        "say": "Lo sentimos, estamos teniendo problemas para transferir su llamada. Puede acceder a todos nuestros recursos en línea en https://www.njpn.org/"
-      }
-    },
-    {
-      "name": "lookup_county_from_digit",
-      "type": "make-http-request",
+        "play": "https://njpn-7517.twil.io/send_to_website_spanish.mp3"
+      },
       "transitions": [
         {
           "event": "success",
@@ -967,7 +947,7 @@
       "transitions": [
         {
           "event": "success",
-          "next": "connect_to_county"
+          "next": "say_play_1"
         },
         {
           "event": "failed",
@@ -982,18 +962,27 @@
           "x": -247,
           "y": 2573
         },
-        "parameters": [
-          {
-            "key": "county",
-            "value": "{{widgets.validateCounty.parsed.county}}"
-          }
-        ],
-        "url": "{{flow.variables.API_BASE_URL}}/county_number"
-      }
+        "play": "https://njpn-7517.twil.io/send_to_website.mp3"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
     },
     {
-      "name": "lookup_county_number_spanish",
-      "type": "make-http-request",
+      "name": "connect_to_county",
+      "properties": {
+        "caller_id": "{{contact.channel.address}}",
+        "noun": "number",
+        "offset": {
+          "x": -309,
+          "y": 3047
+        },
+        "timeout": 30,
+        "to": "{{widgets.lookup_county_number.parsed.number}}"
+      },
       "transitions": [
         {
           "event": "success",
@@ -1044,7 +1033,41 @@
       "type": "say-play",
       "transitions": [
         {
-          "event": "audioComplete"
+          "event": "callCompleted",
+          "next": "voicemail_no_representative_message"
+        },
+        {
+          "event": "hangup"
+        }
+      ],
+      "type": "connect-call-to"
+    },
+    {
+      "name": "county_areas_spanish",
+      "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en",
+        "loop": 1,
+        "offset": {
+          "x": 746,
+          "y": 2223
+        },
+        "play": "https://njpn-7517.twil.io/county_areas_spanish.mp3",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
+      "transitions": [
+        {
+          "event": "keypress",
+          "next": "map_county_spanish"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
         }
       ],
       "properties": {
@@ -1148,12 +1171,8 @@
           "x": -2025,
           "y": 1687
         },
-        "play": "https://njpn-7517.twil.io/recording_complete.mp3"
-      }
-    },
-    {
-      "name": "recording_complete_closed_spanish",
-      "type": "say-play",
+        "play": "https://njpn-7517.twil.io/connect_to_county_message_spanish.mp3"
+      },
       "transitions": [
         {
           "event": "audioComplete"
@@ -1211,18 +1230,19 @@
       "properties": {
         "input": "{{widgets.gather_county.SpeechResult}}",
         "offset": {
-          "x": -128,
-          "y": 1679
-        }
-      }
-    },
-    {
-      "name": "repeat_or_voicemail",
-      "type": "split-based-on",
+          "x": -1512,
+          "y": 827
+        },
+        "play": "https://njpn-7517.twil.io/closed_message_english1.mp3",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
       "transitions": [
         {
-          "event": "noMatch",
-          "next": "voicemail_message_2"
+          "event": "keypress",
+          "next": "invalid_counter"
         },
         {
           "event": "match",
@@ -1242,18 +1262,14 @@
       "properties": {
         "input": "{{widgets.closed_message_english.Digits}}",
         "offset": {
-          "x": -1682,
-          "y": 1084
+          "x": -2527,
+          "y": 1245
         }
-      }
-    },
-    {
-      "name": "repeat_or_voicemail_spanish",
-      "type": "split-based-on",
+      },
       "transitions": [
         {
           "event": "noMatch",
-          "next": "voicemail_message_spanish"
+          "next": "invalid_add"
         },
         {
           "event": "match",
@@ -1267,20 +1283,34 @@
               "type": "equal_to",
               "value": "1"
             }
-          ]
+          ],
+          "event": "match",
+          "next": "closed_message_english"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.closed_message_english.Digits}}"
+              ],
+              "friendly_name": "If value equal_to 2",
+              "type": "equal_to",
+              "value": "2"
+            }
+          ],
+          "event": "match",
+          "next": "voicemail_message_2"
         }
       ],
       "properties": {
         "input": "{{widgets.closed_message_english.Digits}}",
         "offset": {
-          "x": 1351,
-          "y": 1021
-        }
-      }
-    },
-    {
-      "name": "representative_or_county",
-      "type": "split-based-on",
+          "x": -2099,
+          "y": 1706
+        },
+        "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback",
+        "timeout": 60
+      },
       "transitions": [
         {
           "event": "noMatch",
@@ -1407,21 +1437,29 @@
       ],
       "properties": {
         "offset": {
-          "x": 2784,
-          "y": 807
+          "x": -2066,
+          "y": 1488
         },
-        "variables": [
-          {
-            "key": "counter_spanish",
-            "type": "string",
-            "value": "0"
-          }
-        ]
-      }
+        "play": "https://njpn-7517.twil.io/voicemail_message_2.mp3"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "closed_voicemail"
+        }
+      ],
+      "type": "say-play"
     },
     {
-      "name": "set_variables",
-      "type": "set-variables",
+      "name": "recording_complete_closed",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -2299,
+          "y": 1904
+        },
+        "play": "https://njpn-7517.twil.io/recording_complete.mp3"
+      },
       "transitions": [
         {
           "event": "next",
@@ -1743,13 +1781,12 @@
           "x": -3935,
           "y": 4083
         },
-        "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback",
-        "timeout": 60
-      }
-    },
-    {
-      "name": "voicemail_no_representative_message",
-      "type": "say-play",
+        "play": "https://njpn-7517.twil.io/closed_message_spanish1.mp3",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
       "transitions": [
         {
           "event": "audioComplete",
@@ -1770,12 +1807,37 @@
       "type": "record-voicemail",
       "transitions": [
         {
-          "event": "recordingComplete",
-          "next": "recording_complete"
+          "event": "noMatch",
+          "next": "voicemail_message_spanish"
         },
         {
-          "event": "noAudio"
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.closed_message_english.Digits}}"
+              ],
+              "friendly_name": "If value equal_to 1",
+              "type": "equal_to",
+              "value": "1"
+            }
+          ],
+          "event": "match",
+          "next": "closed_message_spanish"
+        }
+      ],
+      "type": "split-based-on"
+    },
+    {
+      "name": "voicemail_message_spanish",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": 942,
+          "y": 1210
         },
+        "play": "https://njpn-7517.twil.io/voicemail_message_spanish.mp3"
+      },
+      "transitions": [
         {
           "event": "hangup"
         }
@@ -1807,12 +1869,201 @@
           "x": 1056,
           "y": -332
         },
-        "play": "https://njpn-7517.twil.io/opening-message.mp3"
-      }
+        "play": "https://njpn-7517.twil.io/recording_complete_spanish.mp3"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "say_play_1",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -353,
+          "y": 2808
+        },
+        "say": "Connecting to your county"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "connect_to_county"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "check_failed",
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": 843,
+          "y": 656
+        },
+        "say": "Sorry, we are experiencing some issues right now. Please try again later."
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
+    },
+    {
+      "name": "invalid_option",
+      "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en",
+        "language": "en-US",
+        "loop": 1,
+        "offset": {
+          "x": -3331,
+          "y": 1829
+        },
+        "say": "You’ve selected an incorrect option. Press 1 to hear again, or press 2 to leave a voicemail.",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
+      "transitions": [
+        {
+          "event": "keypress",
+          "next": "invalid_selection"
+        },
+        {
+          "event": "speech"
+        },
+        {
+          "event": "timeout"
+        }
+      ],
+      "type": "gather-input-on-call"
+    },
+    {
+      "name": "invalid_selection",
+      "properties": {
+        "input": "{{widgets.invalid_option.Digits}}",
+        "offset": {
+          "x": -3523,
+          "y": 2072
+        }
+      },
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "invalid_add"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.invalid_option.Digits}}"
+              ],
+              "friendly_name": "If value equal_to 1",
+              "type": "equal_to",
+              "value": "1"
+            }
+          ],
+          "event": "match",
+          "next": "closed_message_english"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{widgets.invalid_option.Digits}}"
+              ],
+              "friendly_name": "If value equal_to 2",
+              "type": "equal_to",
+              "value": "2"
+            }
+          ],
+          "event": "match",
+          "next": "voicemail_message_2"
+        }
+      ],
+      "type": "split-based-on"
+    },
+    {
+      "name": "invalid_counter",
+      "properties": {
+        "offset": {
+          "x": -2209,
+          "y": 1072
+        },
+        "variables": [
+          {
+            "key": "invalid_counter",
+            "type": "string",
+            "value": "0"
+          }
+        ]
+      },
+      "transitions": [
+        {
+          "event": "next",
+          "next": "repeat_or_voicemail"
+        }
+      ],
+      "type": "set-variables"
+    },
+    {
+      "name": "invalid_add",
+      "properties": {
+        "offset": {
+          "x": -2865,
+          "y": 1431
+        },
+        "variables": [
+          {
+            "key": "invalid_counter",
+            "type": "string",
+            "value": "{{flow.variables.invalid_counter | plus: 1}}"
+          }
+        ]
+      },
+      "transitions": [
+        {
+          "event": "next",
+          "next": "split_2"
+        }
+      ],
+      "type": "set-variables"
+    },
+    {
+      "name": "split_2",
+      "properties": {
+        "input": "{{flow.variables.invalid_counter}}",
+        "offset": {
+          "x": -3194,
+          "y": 1634
+        }
+      },
+      "transitions": [
+        {
+          "event": "noMatch"
+        },
+        {
+          "conditions": [
+            {
+              "arguments": [
+                "{{flow.variables.invalid_counter}}"
+              ],
+              "friendly_name": "If value less_than 3",
+              "type": "less_than",
+              "value": "3"
+            }
+          ],
+          "event": "match",
+          "next": "invalid_option"
+        }
+      ],
+      "type": "split-based-on"
     }
-  ],
-  "initial_state": "Trigger",
-  "flags": {
-    "allow_concurrent_calls": true
-  }
+  ]
 }
