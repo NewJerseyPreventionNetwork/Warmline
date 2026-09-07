@@ -34,7 +34,7 @@ export const handler = async function(
         "Warren County",
         //special case for spanish
         "Cabo May", //-> cape may
-        "Representative" //-> representative
+        "Representative"
     ];
 
     //uses event county if exists or normalises to empty

@@ -1326,18 +1326,32 @@
           "x": 910,
           "y": 2625
         },
-        "parameters": [
-          {
-            "key": "county",
-            "value": "{{widgets.map_county_spanish.parsed.county}}"
-          }
-        ],
-        "url": "{{flow.variables.API_BASE_URL}}/county_number"
-      }
+        "play": "https://njpn-7517.twil.io/recording_complete.mp3"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
     },
     {
-      "name": "lookup_county_number",
-      "type": "make-http-request",
+      "name": "county_or_voicemail_select",
+      "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en",
+        "loop": 1,
+        "number_of_digits": 1,
+        "offset": {
+          "x": -365,
+          "y": 2122
+        },
+        "play": "https://njpn-7517.twil.io/county_or_voicemail_select1.mp3",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
       "transitions": [
         {
           "event": "success",
@@ -1771,13 +1785,8 @@
           "x": -3795,
           "y": 3677
         },
-        "timeout": 30,
-        "to": "{{widgets.contact_representative.parsed.number}}"
-      }
-    },
-    {
-      "name": "set_counter",
-      "type": "set-variables",
+        "play": "https://njpn-7517.twil.io/connect_to_county_message.mp3"
+      },
       "transitions": [
         {
           "event": "next",
@@ -2079,17 +2088,19 @@
         }
       ],
       "properties": {
+        "finish_on_key": "#",
+        "gather_language": "en",
         "loop": 1,
         "offset": {
           "x": -843,
           "y": 2600
         },
-        "play": "https://njpn-7517.twil.io/voicemail_message.mp3"
-      }
-    },
-    {
-      "name": "voicemail_message_2",
-      "type": "say-play",
+        "play": "https://njpn-7517.twil.io/invalid_option_spanish.mp3",
+        "speech_model": "default",
+        "speech_timeout": "5",
+        "stop_gather": false,
+        "timeout": 5
+      },
       "transitions": [
         {
           "event": "audioComplete",
@@ -2209,12 +2220,14 @@
           "x": 1056,
           "y": -332
         },
-        "play": "https://njpn-7517.twil.io/opening-message.mp3"
-      }
+        "play": "https://njpn-7517.twil.io/disconnect.mp3"
+      },
+      "transitions": [
+        {
+          "event": "audioComplete"
+        }
+      ],
+      "type": "say-play"
     }
-  ],
-  "initial_state": "Trigger",
-  "flags": {
-    "allow_concurrent_calls": true
-  }
+  ]
 }
