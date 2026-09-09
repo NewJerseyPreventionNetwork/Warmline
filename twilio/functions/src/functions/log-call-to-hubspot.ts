@@ -35,6 +35,9 @@ export const handler = async function(
     callback: CallCallback
 ) {
     try {
+        console.log("=== log-call-to-hubspot START ===");
+        console.log("CallSid received:", event.CallSid);
+
         const callSid = event.CallSid;
 
         if (
@@ -46,9 +49,15 @@ export const handler = async function(
             throw new Error("Missing CallSid");
         }
 
+        console.log("Validating Twilio call:", callSid);
         await context.getTwilioClient().calls(callSid).fetch();
+        console.log("Twilio call validated");
 
+        console.log("Getting HubSpot access token");
         const accessToken = await getHubSpotAccessToken(context);
+        console.log("HubSpot access token received");
+
+        console.log("Creating HubSpot call record for:", callSid);
 
         const response = await fetch(
             "https://api.hubapi.com/crm/v3/objects/calls",
@@ -74,15 +83,21 @@ export const handler = async function(
             }
         );
 
+        console.log("HubSpot create call response status:", response.status);
+
         if (!response.ok) {
             throw new Error(await response.text());
         }
 
         const hubspotCall = await response.json() as HubSpotCallResponse;
 
+        console.log("HubSpot call created:", hubspotCall.id);
+
         if (!hubspotCall.id) {
             throw new Error("HubSpot response did not include a call id");
         }
+
+        console.log("=== log-call-to-hubspot SUCCESS ===");
 
         callback(null, {
             success: true,
@@ -90,6 +105,7 @@ export const handler = async function(
             hubspotCallId: hubspotCall.id
         });
     } catch (err) {
+        console.error("=== log-call-to-hubspot FAILED ===");
         console.error(err);
 
         const response = new Twilio.Response();
@@ -106,6 +122,8 @@ export const handler = async function(
 async function getHubSpotAccessToken(
     context: RuntimeContext
 ): Promise<string> {
+    console.log("Requesting HubSpot access token");
+
     if (!context.HUBSPOT_CLIENT_ID) {
         throw new Error("Missing HUBSPOT_CLIENT_ID");
     }
@@ -134,6 +152,8 @@ async function getHubSpotAccessToken(
         }
     );
 
+    console.log("HubSpot token response status:", response.status);
+
     if (!response.ok) {
         throw new Error(`Token refresh failed: ${await response.text()}`);
     }
@@ -143,6 +163,8 @@ async function getHubSpotAccessToken(
     if (!data.access_token) {
         throw new Error("Token refresh response did not include an access token");
     }
+
+    console.log("HubSpot token request successful");
 
     return data.access_token;
 }
