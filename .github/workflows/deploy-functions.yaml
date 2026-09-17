@@ -20,7 +20,7 @@ jobs:
   deploy_functions:
     if: inputs.ENVIRONMENT == 'Develop' || github.triggering_actor == 'zing-devops'
 
-    uses: zingdevlimited/actions-helpers/.github/workflows/deploy-twilio-functions.yaml@v4
+    uses: zingdevlimited/actions-helpers/.github/workflows/deploy-twilio-functions.yaml@v5
 
     with:
       SERVICE_DIRECTORY: twilio/functions
