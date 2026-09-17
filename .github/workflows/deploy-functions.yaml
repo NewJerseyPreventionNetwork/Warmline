@@ -20,14 +20,50 @@ jobs:
   deploy_functions:
     if: inputs.ENVIRONMENT == 'Develop' || github.triggering_actor == 'zing-devops'
 
-    uses: zingdevlimited/actions-helpers/.github/workflows/deploy-twilio-functions.yaml@v5
+    uses: zingdevlimited/actions-helpers/.github/workflows/deploy-twilio-functions.yaml@v4
 
     with:
       SERVICE_DIRECTORY: twilio/functions
       BUILD_WORKFLOW_NAME: build-functions.yaml
       TWILIO_ACCOUNT_SID: ${{ vars[format('{0}_TWILIO_ACCOUNT_SID', inputs.ENVIRONMENT)] }}
       TWILIO_API_KEY: ${{ vars[format('{0}_TWILIO_API_KEY', inputs.ENVIRONMENT)] }}
-      UI_EDITABLE: false
 
     secrets:
       TWILIO_API_SECRET: ${{ secrets[format('{0}_TWILIO_API_SECRET', inputs.ENVIRONMENT)] }}
+
+  update_functions_ui:
+    needs: deploy_functions
+    if: needs.deploy_functions.result == 'success'
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Disable Twilio Functions Console editing
+        env:
+          SERVICE_NAME: ${{ needs.deploy_functions.outputs.SERVICE_NAME }}
+          TWILIO_API_KEY: ${{ vars[format('{0}_TWILIO_API_KEY', inputs.ENVIRONMENT)] }}
+          TWILIO_API_SECRET: ${{ secrets[format('{0}_TWILIO_API_SECRET', inputs.ENVIRONMENT)] }}
+        run: |
+          services=$(curl --silent --show-error --fail \
+            "https://serverless.twilio.com/v1/Services?PageSize=1000" \
+            -u "$TWILIO_API_KEY:$TWILIO_API_SECRET")
+          service_sid=$(echo "$services" | jq -r --arg service_name "$SERVICE_NAME" \
+            '.services[] | select(.friendly_name == $service_name or .unique_name == $service_name) | .sid' \
+            | head -n 1)
+
+          if [ -z "$service_sid" ]; then
+            echo "::error::Could not find deployed Twilio Functions service: $SERVICE_NAME" >&2
+            exit 1
+          fi
+
+          response=$(curl --silent --show-error --fail \
+            -X POST "https://serverless.twilio.com/v1/Services/$service_sid" \
+            --data-urlencode "UiEditable=false" \
+            -u "$TWILIO_API_KEY:$TWILIO_API_SECRET")
+
+          if [ "$(echo "$response" | jq -r '.sid // empty')" != "$service_sid" ]; then
+            echo "::error::Twilio did not confirm the service UI editability update." >&2
+            echo "$response" >&2
+            exit 1
+          fi
+
+          echo "$response" | jq '{sid, friendly_name, unique_name, ui_editable}'
