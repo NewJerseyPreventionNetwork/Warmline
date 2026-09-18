@@ -1,6 +1,6 @@
 ## Functions
 
-The `functions` directory contains the Twilio Serverless Functions used by the Studio Flow for logic that cannot be handled directly within Studio. Each TypeScript file is deployed as a function route based on its filename, without the `.ts` extension.
+The `functions` directory contains the Twilio Serverless Functions used by the current `NJPN IVR no-county` Studio Flow. Each TypeScript file is deployed as a function route based on its filename, without the `.ts` extension.
 
 ## Call routing
 
@@ -12,14 +12,11 @@ The `functions` directory contains the Twilio Serverless Functions used by the S
 | `agent-result.ts`        | Hangs up after a completed bridge or returns control to the Studio Flow when the agent is unavailable. |
 | `multi-agent-dial.ts`    | Selects the next agent from the configured list and returns the remaining agents for retry logic.      |
 
-## County and opening hours
+## Opening hours
 
-| Function                       | Purpose                                                                                            |
-| ------------------------------ | -------------------------------------------------------------------------------------------------- |
-| `opening_hours.protected.ts`   | Checks whether the current time is within the NJPN weekday opening hours in New Jersey time.       |
-| `validate_county.protected.ts` | Validates and normalizes a county spoken by the caller.                                            |
-| `county_mapping.protected.ts`  | Converts a county PIN entered by the caller into a normalized county name.                         |
-| `county_number.protected.ts`   | Maps a normalized county name to the configured county phone number from the function environment. |
+| Function                     | Purpose                                                                                      |
+| ---------------------------- | -------------------------------------------------------------------------------------------- |
+| `opening_hours.protected.ts` | Checks whether the current time is within the NJPN weekday opening hours in New Jersey time. |
 
 ## HubSpot and recordings
 
