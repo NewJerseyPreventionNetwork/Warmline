@@ -82,7 +82,7 @@
         "method": "GET",
         "offset": {
           "x": 39,
-          "y": 51
+          "y": 52
         },
         "url": "{{flow.variables.API_BASE_URL}}/opening_hours"
       }
@@ -196,7 +196,7 @@
           "x": -1734,
           "y": 1494
         },
-        "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback",
+        "recording_status_callback_url": "https://njpn-7517.twil.io/recording-status-callback",
         "timeout": 60
       }
     },
@@ -219,34 +219,11 @@
         "finish_on_key": "#",
         "max_length": 70,
         "offset": {
-          "x": 1588,
-          "y": 2047
+          "x": 1197,
+          "y": 2109
         },
-        "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback",
+        "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback ",
         "timeout": 60
-      }
-    },
-    {
-      "name": "connect_call_hubspot",
-      "type": "connect-call-to",
-      "transitions": [
-        {
-          "event": "callCompleted",
-          "next": "county_or_voicemail_select"
-        },
-        {
-          "event": "hangup"
-        }
-      ],
-      "properties": {
-        "caller_id": "{{contact.channel.address}}",
-        "noun": "number",
-        "offset": {
-          "x": -628,
-          "y": 1877
-        },
-        "timeout": 23,
-        "to": "{{flow.variables.HUBSPOT_NUMBER}}"
       }
     },
     {
@@ -260,8 +237,8 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": 625,
-          "y": 3147
+          "x": 621,
+          "y": 3096
         },
         "play": "https://njpn-7517.twil.io/send_to_website1.mp3"
       }
@@ -277,8 +254,8 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": 2362,
-          "y": 1989
+          "x": 2313,
+          "y": 2011
         },
         "play": "https://njpn-7517.twil.io/send_to_website_spanish1.mp3"
       }
@@ -295,8 +272,8 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": 1965,
-          "y": 2147
+          "x": 1916,
+          "y": 2263
         },
         "play": "https://njpn-7517.twil.io/connect_to_county_message_spanish.mp3"
       }
@@ -336,8 +313,8 @@
         "language": "es-US",
         "loop": 1,
         "offset": {
-          "x": 1593,
-          "y": 3119
+          "x": 1521,
+          "y": 3111
         },
         "play": "https://njpn-7517.twil.io/connect_to_county_message_spanish.mp3"
       }
@@ -357,8 +334,8 @@
         "caller_id": "{{contact.channel.address}}",
         "noun": "number",
         "offset": {
-          "x": 1416,
-          "y": 2745
+          "x": 1915,
+          "y": 2465
         },
         "timeout": 30,
         "to": "{{widgets.lookup_county_number_spanish.parsed.number}}"
@@ -542,8 +519,8 @@
       "properties": {
         "input": "{{widgets.county_or_voicemail_select.Digits}}",
         "offset": {
-          "x": -503,
-          "y": 2503
+          "x": -513,
+          "y": 2509
         }
       }
     },
@@ -569,8 +546,8 @@
         "loop": 1,
         "number_of_digits": 1,
         "offset": {
-          "x": -365,
-          "y": 2122
+          "x": -395,
+          "y": 2140
         },
         "play": "https://njpn-7517.twil.io/county_or_voicemail_select1.mp3",
         "speech_model": "default",
@@ -712,8 +689,8 @@
       ],
       "properties": {
         "offset": {
-          "x": 2770,
-          "y": 2995
+          "x": 2771,
+          "y": 2999
         },
         "variables": [
           {
@@ -943,6 +920,31 @@
         "speech_timeout": "5",
         "stop_gather": false,
         "timeout": 5
+      }
+    },
+    {
+      "name": "hubspot_connect",
+      "type": "add-twiml-redirect",
+      "transitions": [
+        {
+          "event": "return",
+          "next": "split_3"
+        },
+        {
+          "event": "timeout"
+        },
+        {
+          "event": "fail"
+        }
+      ],
+      "properties": {
+        "method": "POST",
+        "offset": {
+          "x": -490,
+          "y": 1885
+        },
+        "timeout": "14400",
+        "url": "https://test-8896.twil.io/agent-dial?agent={{widgets.multi_agent_dial.parsed.nextAgent}}"
       }
     },
     {
@@ -1462,7 +1464,7 @@
             "value": "{{trigger.call.CallSid}}"
           }
         ],
-        "url": "{{widgets.set_variables.parsed.API_BASE_URL}}/log-call-to-hubspot"
+        "url": "{{flow.variables.API_BASE_URL}}/log-call-to-hubspot"
       }
     },
     {
@@ -1505,7 +1507,7 @@
       "transitions": [
         {
           "event": "success",
-          "next": "connect_call_hubspot"
+          "next": "multi_agent_dial"
         },
         {
           "event": "failed",
@@ -1518,8 +1520,8 @@
         "content_type": "application/x-www-form-urlencoded;charset=utf-8",
         "method": "GET",
         "offset": {
-          "x": -2049,
-          "y": 3124
+          "x": -2043,
+          "y": 3141
         },
         "parameters": [
           {
@@ -1579,8 +1581,8 @@
         "content_type": "application/x-www-form-urlencoded;charset=utf-8",
         "method": "GET",
         "offset": {
-          "x": 364,
-          "y": 2920
+          "x": 220,
+          "y": 2939
         },
         "parameters": [
           {
@@ -1597,7 +1599,7 @@
       "transitions": [
         {
           "event": "success",
-          "next": "connect_test"
+          "next": "voicemail_message_spanish"
         },
         {
           "event": "failed",
@@ -1700,6 +1702,35 @@
       }
     },
     {
+      "name": "multi_agent_dial",
+      "type": "make-http-request",
+      "transitions": [
+        {
+          "event": "success",
+          "next": "set_variables_3"
+        },
+        {
+          "event": "failed"
+        }
+      ],
+      "properties": {
+        "add_twilio_auth": false,
+        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
+        "method": "GET",
+        "offset": {
+          "x": -571,
+          "y": 1643
+        },
+        "parameters": [
+          {
+            "key": "remainingAgents",
+            "value": "{{flow.variables.remainingAgents}}"
+          }
+        ],
+        "url": "https://test-8896.twil.io/multi-agent-dial"
+      }
+    },
+    {
       "name": "no_input_language",
       "type": "say-play",
       "transitions": [
@@ -1762,8 +1793,8 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": 1663,
-          "y": 2324
+          "x": 1123,
+          "y": 2361
         },
         "play": "https://njpn-7517.twil.io/recording_complete_spanish.mp3"
       }
@@ -1791,7 +1822,7 @@
       "transitions": [
         {
           "event": "noMatch",
-          "next": "connect_call_hubspot"
+          "next": "multi_agent_dial"
         },
         {
           "event": "match",
@@ -1899,7 +1930,7 @@
         }
       ],
       "properties": {
-        "input": "{{widgets.closed_message_english.Digits}}",
+        "input": "{{widgets.closed_message_spanish.Digits}}",
         "offset": {
           "x": 693,
           "y": 1495
@@ -2140,6 +2171,34 @@
       }
     },
     {
+      "name": "set_variables_3",
+      "type": "set-variables",
+      "transitions": [
+        {
+          "event": "next",
+          "next": "hubspot_connect"
+        }
+      ],
+      "properties": {
+        "offset": {
+          "x": -977,
+          "y": 1830
+        },
+        "variables": [
+          {
+            "key": "lastAgent",
+            "type": "string",
+            "value": "{{widgets.multi_agent_dial.parsed.lastAgent}}"
+          },
+          {
+            "key": "remainingAgents",
+            "type": "string",
+            "value": "{{widgets.mutli_agent_dial.parsed.remainingAgents}}"
+          }
+        ]
+      }
+    },
+    {
       "name": "split_1",
       "type": "split-based-on",
       "transitions": [
@@ -2229,6 +2288,37 @@
         "offset": {
           "x": 1723,
           "y": -183
+        }
+      }
+    },
+    {
+      "name": "split_3",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "multi_agent_dial"
+        },
+        {
+          "event": "match",
+          "next": "county_or_voicemail_select",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{flow.variables.lastAgent}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{flow.variables.lastAgent}}",
+        "offset": {
+          "x": -1160,
+          "y": 2104
         }
       }
     },
@@ -2469,8 +2559,8 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": 1517,
-          "y": 1823
+          "x": 1282,
+          "y": 1804
         },
         "play": "https://njpn-7517.twil.io/voicemail_message_spanish.mp3"
       }
@@ -2541,7 +2631,7 @@
           "x": -503,
           "y": 2993
         },
-        "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback",
+        "recording_status_callback_url": "https://njpn-7517.twil.io/recording-status-callback",
         "timeout": 60
       }
     },
