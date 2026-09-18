@@ -33,7 +33,7 @@ twilio/
     └── Twilio Serverless Functions
 ```
 
-### Studio 
+### Studio
 
 Studio related docs can be found here: /twilio/studio/README.md
 
@@ -51,12 +51,14 @@ The HubSpot calling configuration must be set up correctly for agents to receive
 
 The integration is designed so that unanswered calls can return to Twilio rather than remaining within HubSpot voicemail handling. The studio flow then routes that call to the correct county phone number
 
+TODO: Hubspot permissions + press 1
+
 ## Environments
 
 The project supports separate Twilio environments:
 
-* Development
-* Production
+- Development
+- Production
 
 TO-DO: Environment specific values such as phone numbers, API URLs and other configuration should be provided through the relevant environment configuration and deployment pipeline rather than being hardcoded into the Studio Flow or Functions.
 
@@ -66,21 +68,20 @@ GitHub Actions are used to deploy the Twilio resources.
 
 The deployment pipelines handle:
 
-* Building the Twilio Functions
-* Deploying Functions and Assets
-* Deploying Studio Flows
-* Applying environment specific configuration
+- Building the Twilio Functions
+- Deploying Functions and Assets
+- Deploying Studio Flows
+- Applying environment specific configuration
 
 This allows changes to the Twilio solution to be managed through source control and deployed consistently across environments.
-
 
 Changes should not normally be made directly within the Prod Twilio Console Env as this can cause the deployed configuration and the repository configuration to become out of sync.
 
 ## Technologies used for this project
 
-* Twilio Studio
-* Twilio Functions
-* Twilio Voice
-* TypeScript
-* HubSpot
-* GitHub Actions
+- Twilio Studio
+- Twilio Functions
+- Twilio Voice
+- TypeScript
+- HubSpot
+- GitHub Actions
