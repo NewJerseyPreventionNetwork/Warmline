@@ -11,7 +11,7 @@ export const handler = function (
   callback: Callback,
 ) {
   const response = new twiml.VoiceResponse();
-  const agent = event.agent || "+18563867498";
+  const agent = event.agent;
 
   const dial = response.dial({
     answerOnBridge: true,

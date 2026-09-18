@@ -5,7 +5,7 @@ import type {
 } from "@twilio-labs/serverless-runtime-types";
 
 export const handler = async function (
-  _context: Context,
+  context: Context,
   event: Event,
   callback: Callback,
 ) {
@@ -14,7 +14,12 @@ export const handler = async function (
 
     // First attempt
     if (!event.remainingAgents) {
-      remainingAgents = ["+18563867498", "+18566197424", "+16093224782"];
+      if (!context.AGENT_NUMBERS) {
+        throw new Error("Missing AGENT_NUMBERS");
+      }
+
+      const configuredAgents = JSON.parse(context.AGENT_NUMBERS);
+      remainingAgents = configuredAgents;
     } else {
       remainingAgents = JSON.parse(event.remainingAgents) as string[];
     }
