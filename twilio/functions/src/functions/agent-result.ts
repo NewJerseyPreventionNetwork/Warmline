@@ -19,7 +19,7 @@ export const handler = function (
     response.hangup();
   } else {
     // Machine, timeout, busy, or rejected screening.
-    response.redirect(`${context.env.STUDIO_WEBHOOK_URL}?FlowEvent=return`);
+    response.redirect(`${context.STUDIO_WEBHOOK_URL}?FlowEvent=return`);
   }
 
   return callback(null, response);
