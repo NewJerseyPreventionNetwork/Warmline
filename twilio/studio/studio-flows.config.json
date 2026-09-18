@@ -7,11 +7,15 @@
       "path": "twilio/studio/flows/njpn-main-ivr.json",
       "subflow": false,
       "allowCreate": true
+    },
+    {
+      "name": "NJPN updated",
+      "path": "twilio/studio/flows/njpn-temporary-flow.json",
+      "subflow": false,
+      "allowCreate": true
     }
   ],
-  "replaceWidgetTypes": [
-    "set-variables"
-  ],
+  "replaceWidgetTypes": ["set-variables"],
   "variableReplacements": {
     "API_BASE_URL": "$API_BASE_URL",
     "HUBSPOT_NUMBER": "$HUBSPOT_NUMBER"
