@@ -57,8 +57,8 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": 1935,
-          "y": 535
+          "x": 2438,
+          "y": 757
         },
         "play": "https://njpn-7517.twil.io/check_failed_spanish.mp3"
       }
@@ -105,8 +105,8 @@
         "content_type": "application/x-www-form-urlencoded;charset=utf-8",
         "method": "GET",
         "offset": {
-          "x": 1450,
-          "y": 346
+          "x": 2079,
+          "y": 559
         },
         "url": "{{flow.variables.API_BASE_URL}}/opening_hours"
       }
@@ -133,8 +133,8 @@
         "loop": 1,
         "number_of_digits": 1,
         "offset": {
-          "x": -661,
-          "y": 604
+          "x": -1263,
+          "y": 602
         },
         "play": "https://njpn-7517.twil.io/closed_message_english.mp3",
         "speech_model": "default",
@@ -164,8 +164,8 @@
         "gather_language": "en",
         "loop": 1,
         "offset": {
-          "x": 1125,
-          "y": 1007
+          "x": 1464,
+          "y": 1121
         },
         "play": "https://njpn-7517.twil.io/closed_message_spanish.mp3",
         "speech_model": "default",
@@ -193,8 +193,8 @@
         "finish_on_key": "#",
         "max_length": 70,
         "offset": {
-          "x": -1734,
-          "y": 1494
+          "x": -2041,
+          "y": 1913
         },
         "recording_status_callback_url": "https://njpn-7517.twil.io/recording-status-callback",
         "timeout": 60
@@ -219,486 +219,11 @@
         "finish_on_key": "#",
         "max_length": 70,
         "offset": {
-          "x": 1197,
-          "y": 2109
+          "x": 2034,
+          "y": 2259
         },
-        "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback ",
+        "recording_status_callback_url": "https://njpn-7517.twil.io/recording-status-callback",
         "timeout": 60
-      }
-    },
-    {
-      "name": "connect_failed",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": 621,
-          "y": 3096
-        },
-        "play": "https://njpn-7517.twil.io/send_to_website1.mp3"
-      }
-    },
-    {
-      "name": "connect_failed_spanish",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": 2313,
-          "y": 2011
-        },
-        "play": "https://njpn-7517.twil.io/send_to_website_spanish1.mp3"
-      }
-    },
-    {
-      "name": "connect_test",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete",
-          "next": "connect_to_county_spanish"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": 1916,
-          "y": 2263
-        },
-        "play": "https://njpn-7517.twil.io/connect_to_county_message_spanish.mp3"
-      }
-    },
-    {
-      "name": "connect_to_county",
-      "type": "connect-call-to",
-      "transitions": [
-        {
-          "event": "callCompleted"
-        },
-        {
-          "event": "hangup"
-        }
-      ],
-      "properties": {
-        "caller_id": "{{contact.channel.address}}",
-        "noun": "number",
-        "offset": {
-          "x": 25,
-          "y": 3572
-        },
-        "timeout": 30,
-        "to": "{{widgets.lookup_county_number.parsed.number}}"
-      }
-    },
-    {
-      "name": "connect_to_county_from_digit",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete",
-          "next": "send_to_county_spanish"
-        }
-      ],
-      "properties": {
-        "language": "es-US",
-        "loop": 1,
-        "offset": {
-          "x": 1521,
-          "y": 3111
-        },
-        "play": "https://njpn-7517.twil.io/connect_to_county_message_spanish.mp3"
-      }
-    },
-    {
-      "name": "connect_to_county_spanish",
-      "type": "connect-call-to",
-      "transitions": [
-        {
-          "event": "callCompleted"
-        },
-        {
-          "event": "hangup"
-        }
-      ],
-      "properties": {
-        "caller_id": "{{contact.channel.address}}",
-        "noun": "number",
-        "offset": {
-          "x": 1915,
-          "y": 2465
-        },
-        "timeout": 30,
-        "to": "{{widgets.lookup_county_number_spanish.parsed.number}}"
-      }
-    },
-    {
-      "name": "contact_representative",
-      "type": "make-http-request",
-      "transitions": [
-        {
-          "event": "success",
-          "next": "send_to_representative"
-        },
-        {
-          "event": "failed",
-          "next": "lookup_failed"
-        }
-      ],
-      "properties": {
-        "add_twilio_auth": false,
-        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-        "method": "GET",
-        "offset": {
-          "x": -3203,
-          "y": 3213
-        },
-        "parameters": [
-          {
-            "key": "county",
-            "value": "representative"
-          }
-        ],
-        "url": "https://njpn-7517.twil.io/county_number"
-      }
-    },
-    {
-      "name": "counter_add1",
-      "type": "set-variables",
-      "transitions": [
-        {
-          "event": "next",
-          "next": "triesLeft"
-        }
-      ],
-      "properties": {
-        "offset": {
-          "x": -1033,
-          "y": 1691
-        },
-        "variables": [
-          {
-            "key": "counter",
-            "type": "string",
-            "value": "{{flow.variables.counter| plus: 1}}"
-          }
-        ]
-      }
-    },
-    {
-      "name": "counter_add1_spa",
-      "type": "set-variables",
-      "transitions": [
-        {
-          "event": "next",
-          "next": "triesLeft_spa"
-        }
-      ],
-      "properties": {
-        "offset": {
-          "x": 3016,
-          "y": 1416
-        },
-        "variables": [
-          {
-            "key": "counter_spanish",
-            "type": "string",
-            "value": "{{flow.variables.counter_spanish| plus: 1}}"
-          }
-        ]
-      }
-    },
-    {
-      "name": "county_areas",
-      "type": "gather-input-on-call",
-      "transitions": [
-        {
-          "event": "keypress",
-          "next": "map_county"
-        },
-        {
-          "event": "speech"
-        },
-        {
-          "event": "timeout",
-          "next": "digits_counter_add"
-        }
-      ],
-      "properties": {
-        "finish_on_key": "#",
-        "gather_language": "en",
-        "loop": 1,
-        "offset": {
-          "x": -1703,
-          "y": 2105
-        },
-        "play": "https://njpn-7517.twil.io/county_areas.mp3",
-        "speech_model": "default",
-        "speech_timeout": "5",
-        "stop_gather": false,
-        "timeout": 5
-      }
-    },
-    {
-      "name": "county_areas_spanish",
-      "type": "gather-input-on-call",
-      "transitions": [
-        {
-          "event": "keypress",
-          "next": "map_county_spanish"
-        },
-        {
-          "event": "speech"
-        },
-        {
-          "event": "timeout",
-          "next": "digits_counter_add_spanish"
-        }
-      ],
-      "properties": {
-        "finish_on_key": "#",
-        "gather_language": "en",
-        "loop": 1,
-        "offset": {
-          "x": 2795,
-          "y": 2221
-        },
-        "play": "https://njpn-7517.twil.io/county_areas_spanish.mp3",
-        "speech_model": "default",
-        "speech_timeout": "5",
-        "stop_gather": false,
-        "timeout": 5
-      }
-    },
-    {
-      "name": "county_or_voicemail",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "invalid_add_selection"
-        },
-        {
-          "event": "match",
-          "next": "voicemail_message",
-          "conditions": [
-            {
-              "friendly_name": "If value equal_to 1",
-              "arguments": [
-                "{{widgets.county_or_voicemail_select.Digits}}"
-              ],
-              "type": "equal_to",
-              "value": "1"
-            }
-          ]
-        },
-        {
-          "event": "match",
-          "next": "lookup_county_number",
-          "conditions": [
-            {
-              "friendly_name": "If value equal_to 2",
-              "arguments": [
-                "{{widgets.county_or_voicemail_select.Digits}}"
-              ],
-              "type": "equal_to",
-              "value": "2"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{widgets.county_or_voicemail_select.Digits}}",
-        "offset": {
-          "x": -513,
-          "y": 2509
-        }
-      }
-    },
-    {
-      "name": "county_or_voicemail_select",
-      "type": "gather-input-on-call",
-      "transitions": [
-        {
-          "event": "keypress",
-          "next": "invalid_counter_selection"
-        },
-        {
-          "event": "speech"
-        },
-        {
-          "event": "timeout",
-          "next": "invalid_counter_selection"
-        }
-      ],
-      "properties": {
-        "finish_on_key": "#",
-        "gather_language": "en",
-        "loop": 1,
-        "number_of_digits": 1,
-        "offset": {
-          "x": -395,
-          "y": 2140
-        },
-        "play": "https://njpn-7517.twil.io/county_or_voicemail_select1.mp3",
-        "speech_model": "default",
-        "speech_timeout": "5",
-        "stop_gather": false,
-        "timeout": 5
-      }
-    },
-    {
-      "name": "countyTryAgainMsg",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete",
-          "next": "gather_county"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -1108,
-          "y": 986
-        },
-        "play": "https://njpn-7517.twil.io/try-again-voice.mp3"
-      }
-    },
-    {
-      "name": "countyTryAgainMsg_spa",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete",
-          "next": "gather_county_spanish"
-        }
-      ],
-      "properties": {
-        "language": "es-US",
-        "loop": 1,
-        "offset": {
-          "x": 3089,
-          "y": 1970
-        },
-        "play": "https://njpn-7517.twil.io/try-again-voice-spa.mp3"
-      }
-    },
-    {
-      "name": "digit_tries_left",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "contact_representative"
-        },
-        {
-          "event": "match",
-          "next": "county_areas",
-          "conditions": [
-            {
-              "friendly_name": "If value less_than 6",
-              "arguments": [
-                "{{flow.variables.digit_counter}}"
-              ],
-              "type": "less_than",
-              "value": "6"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{flow.variables.counter}}",
-        "offset": {
-          "x": -2676,
-          "y": 3035
-        }
-      }
-    },
-    {
-      "name": "digit_tries_left_spanish",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "connect_failed_spanish"
-        },
-        {
-          "event": "match",
-          "next": "county_areas_spanish",
-          "conditions": [
-            {
-              "friendly_name": "If value less_than 6",
-              "arguments": [
-                "{{flow.variables.digit_counter}}"
-              ],
-              "type": "less_than",
-              "value": "6"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{flow.variables.counter_spanish}}",
-        "offset": {
-          "x": 2815,
-          "y": 3258
-        }
-      }
-    },
-    {
-      "name": "digits_counter_add",
-      "type": "set-variables",
-      "transitions": [
-        {
-          "event": "next",
-          "next": "digit_tries_left"
-        }
-      ],
-      "properties": {
-        "offset": {
-          "x": -2692,
-          "y": 2842
-        },
-        "variables": [
-          {
-            "key": "counter",
-            "type": "string",
-            "value": "{{flow.variables.counter| plus: 1}}"
-          }
-        ]
-      }
-    },
-    {
-      "name": "digits_counter_add_spanish",
-      "type": "set-variables",
-      "transitions": [
-        {
-          "event": "next",
-          "next": "digit_tries_left_spanish"
-        }
-      ],
-      "properties": {
-        "offset": {
-          "x": 2771,
-          "y": 2999
-        },
-        "variables": [
-          {
-            "key": "counter_spanish",
-            "type": "string",
-            "value": "{{flow.variables.counter_spanish| plus: 1}}"
-          }
-        ]
       }
     },
     {
@@ -750,37 +275,6 @@
       }
     },
     {
-      "name": "disconnect_or_continue_selection",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "disconnect"
-        },
-        {
-          "event": "match",
-          "next": "invalid_option_selection",
-          "conditions": [
-            {
-              "friendly_name": "If value less_than 3",
-              "arguments": [
-                "{{flow.variables.invalid_counter}}"
-              ],
-              "type": "less_than",
-              "value": "3"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{flow.variables.invalid_counter}}",
-        "offset": {
-          "x": -1282,
-          "y": 2880
-        }
-      }
-    },
-    {
       "name": "disconnect_or_continue_spanish",
       "type": "split-based-on",
       "transitions": [
@@ -806,8 +300,8 @@
       "properties": {
         "input": "{{flow.variables.invalid_counter}}",
         "offset": {
-          "x": 525,
-          "y": 1919
+          "x": 1022,
+          "y": 2041
         }
       }
     },
@@ -822,72 +316,10 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": 184,
-          "y": 2120
+          "x": 955,
+          "y": 2307
         },
         "play": "https://njpn-7517.twil.io/disconnect_spanish1.mp3"
-      }
-    },
-    {
-      "name": "gather_county",
-      "type": "gather-input-on-call",
-      "transitions": [
-        {
-          "event": "keypress"
-        },
-        {
-          "event": "speech",
-          "next": "validateCounty"
-        },
-        {
-          "event": "timeout",
-          "next": "counter_add1"
-        }
-      ],
-      "properties": {
-        "finish_on_key": "#",
-        "gather_language": "en",
-        "loop": 1,
-        "offset": {
-          "x": -322,
-          "y": 977
-        },
-        "play": "https://njpn-7517.twil.io/gather_county.mp3",
-        "speech_model": "default",
-        "speech_timeout": "5",
-        "stop_gather": false,
-        "timeout": 5
-      }
-    },
-    {
-      "name": "gather_county_spanish",
-      "type": "gather-input-on-call",
-      "transitions": [
-        {
-          "event": "keypress"
-        },
-        {
-          "event": "speech",
-          "next": "validateCountySpanish"
-        },
-        {
-          "event": "timeout",
-          "next": "counter_add1_spa"
-        }
-      ],
-      "properties": {
-        "finish_on_key": "#",
-        "gather_language": "en-US",
-        "loop": 1,
-        "offset": {
-          "x": 2129,
-          "y": 1084
-        },
-        "play": "https://njpn-7517.twil.io/gather_county_spanish.mp3",
-        "speech_model": "default",
-        "speech_timeout": "5",
-        "stop_gather": false,
-        "timeout": 5
       }
     },
     {
@@ -923,6 +355,24 @@
       }
     },
     {
+      "name": "hold_for_agent",
+      "type": "say-play",
+      "transitions": [
+        {
+          "event": "audioComplete",
+          "next": "multi_agent_dial"
+        }
+      ],
+      "properties": {
+        "loop": 1,
+        "offset": {
+          "x": -233,
+          "y": 583
+        },
+        "play": "https://njpn-7517.twil.io/hold_for_agent.mp3"
+      }
+    },
+    {
       "name": "hubspot_connect",
       "type": "add-twiml-redirect",
       "transitions": [
@@ -934,17 +384,18 @@
           "event": "timeout"
         },
         {
-          "event": "fail"
+          "event": "fail",
+          "next": "check_failed"
         }
       ],
       "properties": {
         "method": "POST",
         "offset": {
-          "x": -490,
-          "y": 1885
+          "x": -269,
+          "y": 1480
         },
         "timeout": "14400",
-        "url": "https://test-8896.twil.io/agent-dial?agent={{widgets.multi_agent_dial.parsed.nextAgent}}"
+        "url": "https://njpn-7517.twil.io/agent-dial?agent={{widgets.multi_agent_dial.parsed.nextAgent}}"
       }
     },
     {
@@ -958,31 +409,8 @@
       ],
       "properties": {
         "offset": {
-          "x": -2675,
-          "y": 1103
-        },
-        "variables": [
-          {
-            "key": "invalid_counter",
-            "type": "string",
-            "value": "{{flow.variables.invalid_counter | plus: 1}}"
-          }
-        ]
-      }
-    },
-    {
-      "name": "invalid_add_selection",
-      "type": "set-variables",
-      "transitions": [
-        {
-          "event": "next",
-          "next": "disconnect_or_continue_selection"
-        }
-      ],
-      "properties": {
-        "offset": {
-          "x": -1201,
-          "y": 2678
+          "x": -2737,
+          "y": 1144
         },
         "variables": [
           {
@@ -1004,8 +432,8 @@
       ],
       "properties": {
         "offset": {
-          "x": 457,
-          "y": 1717
+          "x": 648,
+          "y": 1763
         },
         "variables": [
           {
@@ -1027,31 +455,8 @@
       ],
       "properties": {
         "offset": {
-          "x": -2323,
-          "y": 735
-        },
-        "variables": [
-          {
-            "key": "invalid_counter",
-            "type": "string",
-            "value": "0"
-          }
-        ]
-      }
-    },
-    {
-      "name": "invalid_counter_selection",
-      "type": "set-variables",
-      "transitions": [
-        {
-          "event": "next",
-          "next": "county_or_voicemail"
-        }
-      ],
-      "properties": {
-        "offset": {
-          "x": -1135,
-          "y": 2325
+          "x": -1239,
+          "y": 885
         },
         "variables": [
           {
@@ -1073,8 +478,8 @@
       ],
       "properties": {
         "offset": {
-          "x": 1049,
-          "y": 1235
+          "x": 1512,
+          "y": 1454
         },
         "variables": [
           {
@@ -1106,41 +511,10 @@
         "gather_language": "en",
         "loop": 1,
         "offset": {
-          "x": -3074,
-          "y": 1701
+          "x": -3069,
+          "y": 1672
         },
         "play": "https://njpn-7517.twil.io/invalid_options.mp3",
-        "speech_model": "default",
-        "speech_timeout": "5",
-        "stop_gather": false,
-        "timeout": 5
-      }
-    },
-    {
-      "name": "invalid_option_selection",
-      "type": "gather-input-on-call",
-      "transitions": [
-        {
-          "event": "keypress",
-          "next": "invalid_selection_county"
-        },
-        {
-          "event": "speech"
-        },
-        {
-          "event": "timeout",
-          "next": "invalid_add_selection"
-        }
-      ],
-      "properties": {
-        "finish_on_key": "#",
-        "gather_language": "en",
-        "loop": 1,
-        "offset": {
-          "x": -1093,
-          "y": 3119
-        },
-        "play": "https://njpn-7517.twil.io/invalid_option_selection.mp3",
         "speech_model": "default",
         "speech_timeout": "5",
         "stop_gather": false,
@@ -1168,8 +542,8 @@
         "gather_language": "en",
         "loop": 1,
         "offset": {
-          "x": 729,
-          "y": 2160
+          "x": 1291,
+          "y": 2296
         },
         "play": "https://njpn-7517.twil.io/invalid_option_spanish.mp3",
         "speech_model": "default",
@@ -1202,7 +576,7 @@
         },
         {
           "event": "match",
-          "next": "voicemail_message_2",
+          "next": "voicemail_message",
           "conditions": [
             {
               "friendly_name": "If value equal_to 2",
@@ -1218,53 +592,8 @@
       "properties": {
         "input": "{{widgets.invalid_option.Digits}}",
         "offset": {
-          "x": -2331,
-          "y": 1405
-        }
-      }
-    },
-    {
-      "name": "invalid_selection_county",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "invalid_add_selection"
-        },
-        {
-          "event": "match",
-          "next": "voicemail_message",
-          "conditions": [
-            {
-              "friendly_name": "If value equal_to 1",
-              "arguments": [
-                "{{widgets.invalid_option.Digits}}"
-              ],
-              "type": "equal_to",
-              "value": "1"
-            }
-          ]
-        },
-        {
-          "event": "match",
-          "next": "lookup_county_number",
-          "conditions": [
-            {
-              "friendly_name": "If value equal_to 2",
-              "arguments": [
-                "{{widgets.invalid_option.Digits}}"
-              ],
-              "type": "equal_to",
-              "value": "2"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{widgets.invalid_option_selection.Digits}}",
-        "offset": {
-          "x": -1230,
-          "y": 3388
+          "x": -2372,
+          "y": 1340
         }
       }
     },
@@ -1308,8 +637,8 @@
       "properties": {
         "input": "{{widgets.invalid_option.Digits}}",
         "offset": {
-          "x": 239,
-          "y": 2413
+          "x": 1151,
+          "y": 2551
         }
       }
     },
@@ -1323,7 +652,7 @@
         },
         {
           "event": "match",
-          "next": "set_counter",
+          "next": "hold_for_agent",
           "conditions": [
             {
               "friendly_name": "If value equal_to true",
@@ -1354,7 +683,7 @@
         },
         {
           "event": "match",
-          "next": "set_counter_spanish",
+          "next": "send_to_voicemail_spanish",
           "conditions": [
             {
               "friendly_name": "If value equal_to true",
@@ -1370,71 +699,26 @@
       "properties": {
         "input": "{{widgets.check_hours_spanish.parsed.open}}",
         "offset": {
-          "x": 1340,
-          "y": 653
+          "x": 1691,
+          "y": 813
         }
       }
     },
     {
-      "name": "isValid",
-      "type": "split-based-on",
+      "name": "language_disconnect",
+      "type": "say-play",
       "transitions": [
         {
-          "event": "noMatch",
-          "next": "counter_add1"
-        },
-        {
-          "event": "match",
-          "next": "rep_or_county",
-          "conditions": [
-            {
-              "friendly_name": "If value equal_to true",
-              "arguments": [
-                "{{widgets.validateCounty.parsed.valid}}"
-              ],
-              "type": "equal_to",
-              "value": "true"
-            }
-          ]
+          "event": "audioComplete"
         }
       ],
       "properties": {
-        "input": "{{widgets.validateCounty.parsed.valid}}",
+        "loop": 1,
         "offset": {
-          "x": -799,
-          "y": 1377
-        }
-      }
-    },
-    {
-      "name": "isValid_spanish",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "counter_add1_spa"
+          "x": 2304,
+          "y": -233
         },
-        {
-          "event": "match",
-          "next": "lookup_county_number_spanish",
-          "conditions": [
-            {
-              "friendly_name": "If value equal_to true",
-              "arguments": [
-                "{{widgets.validateCounty.parsed.valid}}"
-              ],
-              "type": "equal_to",
-              "value": "true"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{widgets.validateCountySpanish.parsed.valid}}",
-        "offset": {
-          "x": 1482,
-          "y": 1478
-        }
+        "play": "https://njpn-7517.twil.io/disconnect1.mp3"
       }
     },
     {
@@ -1468,240 +752,6 @@
       }
     },
     {
-      "name": "log_functionFail",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -238,
-          "y": 1412
-        },
-        "play": "https://njpn-7517.twil.io/send_to_website1.mp3"
-      }
-    },
-    {
-      "name": "log_functionFail2",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": 2245,
-          "y": 1468
-        },
-        "play": "https://njpn-7517.twil.io/send_to_website_spanish1.mp3"
-      }
-    },
-    {
-      "name": "lookup_county_from_digit",
-      "type": "make-http-request",
-      "transitions": [
-        {
-          "event": "success",
-          "next": "multi_agent_dial"
-        },
-        {
-          "event": "failed",
-          "next": "lookup_failed"
-        }
-      ],
-      "properties": {
-        "add_twilio_auth": false,
-        "body": "{{flow.variables.API_BASE_URL}}/county_mapping",
-        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-        "method": "GET",
-        "offset": {
-          "x": -2043,
-          "y": 3141
-        },
-        "parameters": [
-          {
-            "key": "county",
-            "value": "{{widgets.map_county.parsed.county}}"
-          }
-        ],
-        "url": "{{flow.variables.API_BASE_URL}}/county_number"
-      }
-    },
-    {
-      "name": "lookup_county_from_digit_spanish",
-      "type": "make-http-request",
-      "transitions": [
-        {
-          "event": "success",
-          "next": "connect_to_county_from_digit"
-        },
-        {
-          "event": "failed",
-          "next": "connect_failed_spanish"
-        }
-      ],
-      "properties": {
-        "add_twilio_auth": false,
-        "body": "{{flow.variables.API_BASE_URL}}/county_mapping",
-        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-        "method": "GET",
-        "offset": {
-          "x": 1970,
-          "y": 2913
-        },
-        "parameters": [
-          {
-            "key": "county",
-            "value": "{{widgets.map_county_spanish.parsed.county}}"
-          }
-        ],
-        "url": "{{flow.variables.API_BASE_URL}}/county_number"
-      }
-    },
-    {
-      "name": "lookup_county_number",
-      "type": "make-http-request",
-      "transitions": [
-        {
-          "event": "success",
-          "next": "say_play_1"
-        },
-        {
-          "event": "failed",
-          "next": "connect_failed"
-        }
-      ],
-      "properties": {
-        "add_twilio_auth": false,
-        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-        "method": "GET",
-        "offset": {
-          "x": 220,
-          "y": 2939
-        },
-        "parameters": [
-          {
-            "key": "county",
-            "value": "{{widgets.validateCounty.parsed.county}}"
-          }
-        ],
-        "url": "{{flow.variables.API_BASE_URL}}/county_number"
-      }
-    },
-    {
-      "name": "lookup_county_number_spanish",
-      "type": "make-http-request",
-      "transitions": [
-        {
-          "event": "success",
-          "next": "voicemail_message_spanish"
-        },
-        {
-          "event": "failed",
-          "next": "connect_failed_spanish"
-        }
-      ],
-      "properties": {
-        "add_twilio_auth": false,
-        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-        "method": "GET",
-        "offset": {
-          "x": 2023,
-          "y": 1742
-        },
-        "parameters": [
-          {
-            "key": "county",
-            "value": "{{widgets.validateCountySpanish.parsed.county}}"
-          }
-        ],
-        "url": "{{flow.variables.API_BASE_URL}}/county_number"
-      }
-    },
-    {
-      "name": "lookup_failed",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete"
-        }
-      ],
-      "properties": {
-        "language": "en-US",
-        "loop": 1,
-        "offset": {
-          "x": -1458,
-          "y": 3812
-        },
-        "play": "https://njpn-7517.twil.io/send_to_website1.mp3"
-      }
-    },
-    {
-      "name": "map_county",
-      "type": "make-http-request",
-      "transitions": [
-        {
-          "event": "success",
-          "next": "split_1"
-        },
-        {
-          "event": "failed",
-          "next": "lookup_failed"
-        }
-      ],
-      "properties": {
-        "add_twilio_auth": false,
-        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-        "method": "GET",
-        "offset": {
-          "x": -2162,
-          "y": 2312
-        },
-        "parameters": [
-          {
-            "key": "pin",
-            "value": "{{widgets.county_areas.Digits}}"
-          }
-        ],
-        "url": "{{flow.variables.API_BASE_URL}}/county_mapping"
-      }
-    },
-    {
-      "name": "map_county_spanish",
-      "type": "make-http-request",
-      "transitions": [
-        {
-          "event": "success",
-          "next": "split_1_spanish"
-        },
-        {
-          "event": "failed",
-          "next": "connect_failed_spanish"
-        }
-      ],
-      "properties": {
-        "add_twilio_auth": false,
-        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-        "method": "GET",
-        "offset": {
-          "x": 2533,
-          "y": 2425
-        },
-        "parameters": [
-          {
-            "key": "pin",
-            "value": "{{widgets.county_areas_spanish.Digits}}"
-          }
-        ],
-        "url": "{{flow.variables.API_BASE_URL}}/county_mapping"
-      }
-    },
-    {
       "name": "multi_agent_dial",
       "type": "make-http-request",
       "transitions": [
@@ -1710,7 +760,8 @@
           "next": "set_variables_3"
         },
         {
-          "event": "failed"
+          "event": "failed",
+          "next": "check_failed"
         }
       ],
       "properties": {
@@ -1718,8 +769,8 @@
         "content_type": "application/x-www-form-urlencoded;charset=utf-8",
         "method": "GET",
         "offset": {
-          "x": -571,
-          "y": 1643
+          "x": -319,
+          "y": 856
         },
         "parameters": [
           {
@@ -1727,7 +778,7 @@
             "value": "{{flow.variables.remainingAgents}}"
           }
         ],
-        "url": "https://test-8896.twil.io/multi-agent-dial"
+        "url": "https://njpn-7517.twil.io/multi-agent-dial"
       }
     },
     {
@@ -1749,23 +800,6 @@
       }
     },
     {
-      "name": "recording_complete",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -652,
-          "y": 3209
-        },
-        "play": "https://njpn-7517.twil.io/recording_complete.mp3"
-      }
-    },
-    {
       "name": "recording_complete_closed",
       "type": "say-play",
       "transitions": [
@@ -1776,8 +810,8 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": -1739,
-          "y": 1668
+          "x": -2113,
+          "y": 2141
         },
         "play": "https://njpn-7517.twil.io/recording_complete.mp3"
       }
@@ -1791,60 +825,13 @@
         }
       ],
       "properties": {
+        "language": "es-MX",
         "loop": 1,
         "offset": {
-          "x": 1123,
-          "y": 2361
+          "x": 1961,
+          "y": 2535
         },
-        "play": "https://njpn-7517.twil.io/recording_complete_spanish.mp3"
-      }
-    },
-    {
-      "name": "recording_complete_no_response",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -4060,
-          "y": 4286
-        },
-        "play": "https://njpn-7517.twil.io/recording_complete.mp3"
-      }
-    },
-    {
-      "name": "rep_or_county",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "multi_agent_dial"
-        },
-        {
-          "event": "match",
-          "next": "contact_representative",
-          "conditions": [
-            {
-              "friendly_name": "If value equal_to representative",
-              "arguments": [
-                "{{widgets.gather_county.SpeechResult}}"
-              ],
-              "type": "equal_to",
-              "value": "representative"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{widgets.gather_county.SpeechResult}}",
-        "offset": {
-          "x": -128,
-          "y": 1679
-        }
+        "say": "Gracias. Su mensaje ha sido grabado. Adios"
       }
     },
     {
@@ -1871,7 +858,7 @@
         },
         {
           "event": "match",
-          "next": "voicemail_message_2",
+          "next": "voicemail_message",
           "conditions": [
             {
               "friendly_name": "If value equal_to 2",
@@ -1887,8 +874,8 @@
       "properties": {
         "input": "{{widgets.closed_message_english.Digits}}",
         "offset": {
-          "x": -2456,
-          "y": 921
+          "x": -1416,
+          "y": 1123
         }
       }
     },
@@ -1932,39 +919,8 @@
       "properties": {
         "input": "{{widgets.closed_message_spanish.Digits}}",
         "offset": {
-          "x": 693,
-          "y": 1495
-        }
-      }
-    },
-    {
-      "name": "representative_or_county",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "lookup_county_from_digit"
-        },
-        {
-          "event": "match",
-          "next": "send_to_representative",
-          "conditions": [
-            {
-              "friendly_name": "If value equal_to representative",
-              "arguments": [
-                "{{widdgets.map_county.parsed.county}}"
-              ],
-              "type": "equal_to",
-              "value": "representative"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{widdgets.map_county.parsed.county}}",
-        "offset": {
-          "x": -1847,
-          "y": 2862
+          "x": 715,
+          "y": 1486
         }
       }
     },
@@ -1988,112 +944,40 @@
       }
     },
     {
-      "name": "say_play_1",
+      "name": "send_to_voicemail_message",
       "type": "say-play",
       "transitions": [
         {
           "event": "audioComplete",
-          "next": "connect_to_county"
+          "next": "voicemail_message"
         }
       ],
       "properties": {
         "loop": 1,
         "offset": {
-          "x": 194,
-          "y": 3287
+          "x": -484,
+          "y": 2033
         },
-        "play": "https://njpn-7517.twil.io/connect_to_county_message.mp3"
+        "play": "https://njpn-7517.twil.io/send_to_voicemail_message.mp3"
       }
     },
     {
-      "name": "send_to_county_spanish",
-      "type": "connect-call-to",
+      "name": "send_to_voicemail_spanish",
+      "type": "say-play",
       "transitions": [
         {
-          "event": "callCompleted"
-        },
-        {
-          "event": "hangup"
+          "event": "audioComplete",
+          "next": "voicemail_message_spanish"
         }
       ],
       "properties": {
-        "caller_id": "{{contact.channel.address}}",
-        "noun": "number",
+        "language": "es-US",
+        "loop": 1,
         "offset": {
-          "x": 1292,
-          "y": 3339
+          "x": 2119,
+          "y": 1131
         },
-        "timeout": 30,
-        "to": "{{widgets.lookup_county_from_digit_spanish.parsed.number}}"
-      }
-    },
-    {
-      "name": "send_to_representative",
-      "type": "connect-call-to",
-      "transitions": [
-        {
-          "event": "callCompleted",
-          "next": "voicemail_no_representative_message"
-        },
-        {
-          "event": "hangup"
-        }
-      ],
-      "properties": {
-        "caller_id": "{{contact.channel.address}}",
-        "noun": "number",
-        "offset": {
-          "x": -3795,
-          "y": 3677
-        },
-        "timeout": 30,
-        "to": "{{widgets.contact_representative.parsed.number}}"
-      }
-    },
-    {
-      "name": "set_counter",
-      "type": "set-variables",
-      "transitions": [
-        {
-          "event": "next",
-          "next": "gather_county"
-        }
-      ],
-      "properties": {
-        "offset": {
-          "x": -81,
-          "y": 603
-        },
-        "variables": [
-          {
-            "key": "counter",
-            "type": "string",
-            "value": "0"
-          }
-        ]
-      }
-    },
-    {
-      "name": "set_counter_spanish",
-      "type": "set-variables",
-      "transitions": [
-        {
-          "event": "next",
-          "next": "gather_county_spanish"
-        }
-      ],
-      "properties": {
-        "offset": {
-          "x": 1936,
-          "y": 851
-        },
-        "variables": [
-          {
-            "key": "counter_spanish",
-            "type": "string",
-            "value": "0"
-          }
-        ]
+        "play": "https://njpn-7517.twil.io/send_to_voicemail_spanish.mp3"
       }
     },
     {
@@ -2181,8 +1065,8 @@
       ],
       "properties": {
         "offset": {
-          "x": -977,
-          "y": 1830
+          "x": -153,
+          "y": 1187
         },
         "variables": [
           {
@@ -2193,71 +1077,9 @@
           {
             "key": "remainingAgents",
             "type": "string",
-            "value": "{{widgets.mutli_agent_dial.parsed.remainingAgents}}"
+            "value": "{{widgets.multi_agent_dial.parsed.remainingAgents}}"
           }
         ]
-      }
-    },
-    {
-      "name": "split_1",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "digits_counter_add"
-        },
-        {
-          "event": "match",
-          "next": "representative_or_county",
-          "conditions": [
-            {
-              "friendly_name": "If value equal_to true",
-              "arguments": [
-                "{{widgets.map_county.parsed.valid}}"
-              ],
-              "type": "equal_to",
-              "value": "true"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{widgets.map_county.parsed.valid}}",
-        "offset": {
-          "x": -2390,
-          "y": 2634
-        }
-      }
-    },
-    {
-      "name": "split_1_spanish",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "digits_counter_add_spanish"
-        },
-        {
-          "event": "match",
-          "next": "lookup_county_from_digit_spanish",
-          "conditions": [
-            {
-              "friendly_name": "If value equal_to true",
-              "arguments": [
-                "{{widgets.map_county.parsed.valid}}"
-              ],
-              "type": "equal_to",
-              "value": "true"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{widgets.map_county_spanish.parsed.valid}}",
-        "offset": {
-          "x": 2551,
-          "y": 2690
-        }
       }
     },
     {
@@ -2266,7 +1088,7 @@
       "transitions": [
         {
           "event": "noMatch",
-          "next": "check_failed"
+          "next": "language_disconnect"
         },
         {
           "event": "match",
@@ -2287,7 +1109,7 @@
         "input": "{{flow.variables.language_counter}}",
         "offset": {
           "x": 1723,
-          "y": -183
+          "y": -162
         }
       }
     },
@@ -2301,7 +1123,7 @@
         },
         {
           "event": "match",
-          "next": "county_or_voicemail_select",
+          "next": "send_to_voicemail_message",
           "conditions": [
             {
               "friendly_name": "If value equal_to true",
@@ -2317,8 +1139,8 @@
       "properties": {
         "input": "{{flow.variables.lastAgent}}",
         "offset": {
-          "x": -1160,
-          "y": 2104
+          "x": -564,
+          "y": 1742
         }
       }
     },
@@ -2390,147 +1212,7 @@
       }
     },
     {
-      "name": "triesLeft",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "county_areas"
-        },
-        {
-          "event": "match",
-          "next": "countyTryAgainMsg",
-          "conditions": [
-            {
-              "friendly_name": "If value less_than 3",
-              "arguments": [
-                "{{flow.variables.counter}}"
-              ],
-              "type": "less_than",
-              "value": "3"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{flow.variables.counter}}",
-        "offset": {
-          "x": -1375,
-          "y": 1876
-        }
-      }
-    },
-    {
-      "name": "triesLeft_spa",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "county_areas_spanish"
-        },
-        {
-          "event": "match",
-          "next": "countyTryAgainMsg_spa",
-          "conditions": [
-            {
-              "friendly_name": "If value less_than 3",
-              "arguments": [
-                "{{flow.variables.counter_spanish}}"
-              ],
-              "type": "less_than",
-              "value": "3"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{flow.variables.counter_spanish}}",
-        "offset": {
-          "x": 2753,
-          "y": 1659
-        }
-      }
-    },
-    {
-      "name": "validateCounty",
-      "type": "make-http-request",
-      "transitions": [
-        {
-          "event": "success",
-          "next": "isValid"
-        },
-        {
-          "event": "failed",
-          "next": "log_functionFail"
-        }
-      ],
-      "properties": {
-        "add_twilio_auth": false,
-        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-        "method": "POST",
-        "offset": {
-          "x": -585,
-          "y": 1176
-        },
-        "parameters": [
-          {
-            "key": "county",
-            "value": "{{widgets.gather_county.SpeechResult}}"
-          }
-        ],
-        "url": "{{flow.variables.API_BASE_URL}}/validate_county"
-      }
-    },
-    {
-      "name": "validateCountySpanish",
-      "type": "make-http-request",
-      "transitions": [
-        {
-          "event": "success",
-          "next": "isValid_spanish"
-        },
-        {
-          "event": "failed",
-          "next": "log_functionFail2"
-        }
-      ],
-      "properties": {
-        "add_twilio_auth": false,
-        "content_type": "application/x-www-form-urlencoded;charset=utf-8",
-        "method": "POST",
-        "offset": {
-          "x": 2012,
-          "y": 1275
-        },
-        "parameters": [
-          {
-            "key": "county",
-            "value": "{{widgets.gather_county_spanish.SpeechResult}}"
-          }
-        ],
-        "url": "{{flow.variables.API_BASE_URL}}/validate_county"
-      }
-    },
-    {
       "name": "voicemail_message",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete",
-          "next": "voicemail_no_response"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -582,
-          "y": 2780
-        },
-        "play": "https://njpn-7517.twil.io/voicemail_message.mp3"
-      }
-    },
-    {
-      "name": "voicemail_message_2",
       "type": "say-play",
       "transitions": [
         {
@@ -2541,10 +1223,10 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": -1762,
-          "y": 1305
+          "x": -1956,
+          "y": 1646
         },
-        "play": "https://njpn-7517.twil.io/voicemail_message_2.mp3"
+        "play": "https://njpn-7517.twil.io/voicemail_message.mp3"
       }
     },
     {
@@ -2557,82 +1239,13 @@
         }
       ],
       "properties": {
+        "language": "es-US",
         "loop": 1,
         "offset": {
-          "x": 1282,
-          "y": 1804
+          "x": 1771,
+          "y": 1986
         },
-        "play": "https://njpn-7517.twil.io/voicemail_message_spanish.mp3"
-      }
-    },
-    {
-      "name": "voicemail_no_representative",
-      "type": "record-voicemail",
-      "transitions": [
-        {
-          "event": "recordingComplete",
-          "next": "recording_complete_no_response"
-        },
-        {
-          "event": "noAudio"
-        },
-        {
-          "event": "hangup"
-        }
-      ],
-      "properties": {
-        "finish_on_key": "#",
-        "max_length": 60,
-        "offset": {
-          "x": -3935,
-          "y": 4083
-        },
-        "recording_status_callback_url": "{{widgets.set_variables.parsed.API_BASE_URL}}/recording-status-callback",
-        "timeout": 60
-      }
-    },
-    {
-      "name": "voicemail_no_representative_message",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete",
-          "next": "voicemail_no_representative"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -3801,
-          "y": 3882
-        },
-        "play": "https://njpn-7517.twil.io/voicemail_no_representative_message.mp3"
-      }
-    },
-    {
-      "name": "voicemail_no_response",
-      "type": "record-voicemail",
-      "transitions": [
-        {
-          "event": "recordingComplete",
-          "next": "recording_complete"
-        },
-        {
-          "event": "noAudio"
-        },
-        {
-          "event": "hangup"
-        }
-      ],
-      "properties": {
-        "finish_on_key": "#",
-        "max_length": 70,
-        "offset": {
-          "x": -503,
-          "y": 2993
-        },
-        "recording_status_callback_url": "https://njpn-7517.twil.io/recording-status-callback",
-        "timeout": 60
+        "say": "Tu mensaje comenzará a grabarse después del tono. Presiona # cuando hayas terminado o la grabación se detendrá tras 1 minuto."
       }
     },
     {
