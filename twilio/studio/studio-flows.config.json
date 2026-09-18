@@ -9,7 +9,7 @@
       "allowCreate": true
     },
     {
-      "name": "NJPN updated",
+      "name": "NJPN IVR Temp",
       "path": "twilio/studio/flows/njpn-temporary-flow.json",
       "subflow": false,
       "allowCreate": true
