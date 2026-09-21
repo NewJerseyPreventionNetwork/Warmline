@@ -43,8 +43,6 @@ Before the service can create HubSpot call records or provide recordings, a Twil
 
 Configure them separately for Development and Production. These values are not added automatically by GitHub Actions. After adding or changing them, deploy the Functions Service environment so the running Functions can use them.
 
-TODO: add the rest
-
 | Setting                       | What it is for                                                       |
 | ----------------------------- | -------------------------------------------------------------------- |
 | `HUBSPOT_APP_ID`              | Identifies the NJPN connection in HubSpot.                           |
@@ -55,8 +53,14 @@ TODO: add the rest
 | `SHARED_SECRET`               | Protects temporary recording links. Keep it secret.                  |
 | `ACCOUNT_SID`                 | Identifies the Twilio account that stores recordings.                |
 | `AUTH_TOKEN`                  | Private Twilio password used to retrieve recordings. Keep it secret. |
+| `AGENT_NUMBERS`               | JSON array of agent phone numbers used for call routing.             |
+| `WEBHOOK_URL`                 | Function callback URL used to return rejected agent calls to Studio. |
 
-The service creates a HubSpot call record when a call starts. When a recording is ready, it updates that record so the recording can be played. Temporary recording links expire after 10 minutes.
+Set `AGENT_NUMBERS` as one text value containing a JSON array, for example:
+
+```json
+["+18563867498", "+18566197424", "+16093224782"]
+```
 
 Do not commit any of these values to the repository.
 
@@ -75,7 +79,6 @@ The same environment must be used for the Functions Service and the Studio Flow.
 | `Develop_TWILIO_API_KEY` or `Production_TWILIO_API_KEY`         | Repository variable | Allows GitHub Actions to connect to Twilio.             |
 | `Develop_TWILIO_API_SECRET` or `Production_TWILIO_API_SECRET`   | Repository secret   | Private credential for the Twilio connection.           |
 | `Develop_BASE_URL` or `Production_BASE_URL`                     | Repository variable | The web address of the matching Functions Service.      |
-| `Develop_HUBSPOT_NUMBER` or `Production_HUBSPOT_NUMBER`         | Repository variable | The HubSpot phone number for that environment.          |
 
 The API secret must be stored as a GitHub **secret**. Do not commit it to the repository.
 
@@ -96,12 +99,9 @@ Run the **Deploy Studio Flows** GitHub Actions workflow for the same environment
 
 The workflow selects the matching GitHub repository variables and writes them into the Studio Flow through [twilio/studio/studio-flows.config.json](twilio/studio/studio-flows.config.json):
 
-TODO: CHANGE HUBSPOT_NUMBER
-
-| Studio Flow value | Filled from                                             |
-| ----------------- | ------------------------------------------------------- |
-| `API_BASE_URL`    | `Develop_BASE_URL` or `Production_BASE_URL`             |
-| `HUBSPOT_NUMBER`  | `Develop_HUBSPOT_NUMBER` or `Production_HUBSPOT_NUMBER` |
+| Studio Flow value | Filled from                                 |
+| ----------------- | ------------------------------------------- |
+| `API_BASE_URL`    | `Develop_BASE_URL` or `Production_BASE_URL` |
 
 These values are added to the Studio Flow **when the Deploy Studio Flows workflow publishes it**. They are not GitHub secrets and do not need to be typed manually into the Studio Console when using this workflow.
 
@@ -125,8 +125,7 @@ Agents should keep the HubSpot calling window open and show themselves as availa
 2. Listen to the screening message.
 3. Press **`1` within 5 seconds** to accept the caller.
 
-TODO: DO NOT HAVE NUMBERS HARDCODED
-A timeout, busy line, closed calling window, or any key other than `1` rejects the attempt. The current agent list is maintained in [twilio/functions/src/functions/multi-agent-dial.ts](twilio/functions/src/functions/multi-agent-dial.ts).
+A timeout, busy line, closed calling window, or any key other than `1` rejects the attempt. The agent list is configured through the `AGENT_NUMBERS` Twilio runtime variable.
 
 ## Local development and CI/CD
 

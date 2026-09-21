@@ -32,6 +32,5 @@ The agent functions call `/agent-screen`, `/agent-screen-result`, and `/agent-re
 The deployment configuration replaces these flow variables during Studio deployment:
 
 - `API_BASE_URL`: the deployed Twilio Functions service URL.
-- `HUBSPOT_NUMBER`: the HubSpot destination number.
 
-These values are supplied by the deployment pipeline for the selected environment.
+This value is supplied by the deployment pipeline for the selected environment.
