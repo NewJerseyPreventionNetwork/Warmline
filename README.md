@@ -1,83 +1,148 @@
-# New-Jersey-Prevention-Network
+# New Jersey Prevention Network
 
-This repository contains pipelines and configuration for deploying the Twilio infrastructure required for the overall solution.
+This repository contains the files used to run the NJPN incoming phone service.
 
-The solution uses **Twilio Studio** and **Twilio Functions** to handle incoming calls, collect county information from callers, and route calls to the appropriate destination.
+Twilio answers the phone, checks whether the service is open, contacts agents, and sends call information and recordings to HubSpot.
 
-## Overview
+## Start here
 
-When a caller contacts the NJPN Twilio number, the Studio Flow handles the call and determines where it should be routed.
+The current phone flow is called `NJPN IVR no-county`. It does not ask callers for their county or route calls to county-specific numbers. The flow diagram is [docs/flow-diagrams/njpn-main-ivr.svg](docs/flow-diagrams/njpn-main-ivr.svg), and the editable Studio Flow is [twilio/studio/flows/njpn-main-ivr.json](twilio/studio/flows/njpn-main-ivr.json).
 
-The main call flow is:
+If you are setting up or deploying the service, follow these sections in order:
 
-1. The caller is welcomed to NJPN.
-2. The caller selects their preferred language.
-3. The flow checks whether the call is within the configured opening hours.
-4. The caller is asked to provide their county.
-5. The county is matched against the supported county list.
-6. The call is sent to the appropriate destination.
-7. Where required (English language selected), the call is routed to the NJPN HubSpot number so an available agent can answer.
-8. If the HubSpot call is not answered, control returns to Twilio and the Studio Flow continues with the appropriate county routing.
-9. If the county cannot be identified, the caller is given additional attempts before the configured fallback route is used.
+1. [Understand the repository](#repository-structure)
+2. [Configure HubSpot and Twilio](#configure-hubspot-and-twilio)
+3. [Prepare GitHub Actions](#prepare-github-actions)
+4. [Deploy the Functions Service](#deploy-the-functions-service)
+5. [Deploy the Studio Flow](#deploy-the-studio-flow)
 
-## Repository Structure
-
-The repository contains two main areas:
+## Repository structure
 
 ```text
 twilio/
-├── studio/
-│   └── Studio Flow configuration
-│
-└── functions/
-    └── Twilio Serverless Functions
+├── studio/       Studio Flow configuration
+└── functions/    Twilio Functions and audio assets
 ```
 
-### Studio
+More detail is available in [twilio/studio/README.md](twilio/studio/README.md) and [twilio/functions/src/functions/README.md](twilio/functions/src/functions/README.md).
 
-Studio related docs can be found here: /twilio/studio/README.md
+## Configure HubSpot and Twilio
 
-### Functions
+### HubSpot account and user access
 
-Functions related docs can be found here: /twilio/functions/src/functions/README.md
+Before publishing the Studio Flow:
 
-## HubSpot Integration
+- Set up the HubSpot calling channel and phone number.
+- Give each agent permission to make and receive calls in HubSpot.
+- Make sure agents are marked as available while working and have the calling window open to receive calls.
+- A HubSpot **Super Admin is required to view and play recordings** in the current setup. Regular calling access by itself may not show recordings.
 
-HubSpot is used as part of the inbound call handling process.
+### Twilio Console setup
 
-Calls can be sent from Twilio to the configured HubSpot number, where they are routed to the appropriate HubSpot agent.
+Before the service can create HubSpot call records or provide recordings, a Twilio administrator must add the following settings to the NJPN **Functions Service** in the Twilio Console.
 
-The HubSpot calling configuration must be set up correctly for agents to receive incoming calls. Agents receiving calls through the HubSpot browser must have their calling window open and be available to receive calls.
+Configure them separately for Development and Production. These values are not added automatically by GitHub Actions. After adding or changing them, deploy the Functions Service environment so the running Functions can use them.
 
-The integration is designed so that unanswered calls can return to Twilio rather than remaining within HubSpot voicemail handling. The studio flow then routes that call to the correct county phone number
+TODO: add the rest
 
-TODO: Hubspot permissions + press 1
+| Setting                       | What it is for                                                       |
+| ----------------------------- | -------------------------------------------------------------------- |
+| `HUBSPOT_APP_ID`              | Identifies the NJPN connection in HubSpot.                           |
+| `HUBSPOT_CLIENT_ID`           | Identifies the HubSpot app.                                          |
+| `HUBSPOT_CLIENT_SECRET`       | Private key for the HubSpot app. Keep it secret.                     |
+| `HUBSPOT_EXTERNAL_ACCOUNT_ID` | Identifies the connected HubSpot account.                            |
+| `HUBSPOT_REFRESH_TOKEN`       | Private permission to update HubSpot. Keep it secret.                |
+| `SHARED_SECRET`               | Protects temporary recording links. Keep it secret.                  |
+| `ACCOUNT_SID`                 | Identifies the Twilio account that stores recordings.                |
+| `AUTH_TOKEN`                  | Private Twilio password used to retrieve recordings. Keep it secret. |
 
-## Environments
+The service creates a HubSpot call record when a call starts. When a recording is ready, it updates that record so the recording can be played. Temporary recording links expire after 10 minutes.
 
-The project supports separate Twilio environments:
+Do not commit any of these values to the repository.
 
-- Development
-- Production
+## Prepare GitHub Actions
 
-TO-DO: Environment specific values such as phone numbers, API URLs and other configuration should be provided through the relevant environment configuration and deployment pipeline rather than being hardcoded into the Studio Flow or Functions.
+The project has two separate Twilio environments:
 
-## CI/CD
+- **Development** for testing changes
+- **Production** for the live phone service
 
-GitHub Actions are used to deploy the Twilio resources.
+The same environment must be used for the Functions Service and the Studio Flow. A GitHub administrator must add these settings to the repository:
 
-The deployment pipelines handle:
+| GitHub setting                                                  | Type                | Used by                                                 |
+| --------------------------------------------------------------- | ------------------- | ------------------------------------------------------- |
+| `Develop_TWILIO_ACCOUNT_SID` or `Production_TWILIO_ACCOUNT_SID` | Repository variable | Identifies the Twilio account for Functions deployment. |
+| `Develop_TWILIO_API_KEY` or `Production_TWILIO_API_KEY`         | Repository variable | Allows GitHub Actions to connect to Twilio.             |
+| `Develop_TWILIO_API_SECRET` or `Production_TWILIO_API_SECRET`   | Repository secret   | Private credential for the Twilio connection.           |
+| `Develop_BASE_URL` or `Production_BASE_URL`                     | Repository variable | The web address of the matching Functions Service.      |
+| `Develop_HUBSPOT_NUMBER` or `Production_HUBSPOT_NUMBER`         | Repository variable | The HubSpot phone number for that environment.          |
 
-- Building the Twilio Functions
-- Deploying Functions and Assets
-- Deploying Studio Flows
-- Applying environment specific configuration
+The API secret must be stored as a GitHub **secret**. Do not commit it to the repository.
 
-This allows changes to the Twilio solution to be managed through source control and deployed consistently across environments.
+## Deploy the Functions Service
 
-Changes should not normally be made directly within the Prod Twilio Console Env as this can cause the deployed configuration and the repository configuration to become out of sync.
+Run the **Deploy Functions** GitHub Actions workflow for Development or Production. This builds and uploads the Functions code to the matching Twilio Functions Service.
 
-## Technologies used for this project
+After the first deployment:
+
+1. Add the HubSpot and recording settings in the Twilio Console.
+2. Deploy the Functions Service again so the settings are active.
+
+Do not use a Development Functions Service with the Production Studio Flow, or the other way around.
+
+## Deploy the Studio Flow
+
+Run the **Deploy Studio Flows** GitHub Actions workflow for the same environment used for the Functions Service.
+
+The workflow selects the matching GitHub repository variables and writes them into the Studio Flow through [twilio/studio/studio-flows.config.json](twilio/studio/studio-flows.config.json):
+
+TODO: CHANGE HUBSPOT_NUMBER
+
+| Studio Flow value | Filled from                                             |
+| ----------------- | ------------------------------------------------------- |
+| `API_BASE_URL`    | `Develop_BASE_URL` or `Production_BASE_URL`             |
+| `HUBSPOT_NUMBER`  | `Develop_HUBSPOT_NUMBER` or `Production_HUBSPOT_NUMBER` |
+
+These values are added to the Studio Flow **when the Deploy Studio Flows workflow publishes it**. They are not GitHub secrets and do not need to be typed manually into the Studio Console when using this workflow.
+
+## How the call flow works
+
+1. The caller hears the welcome message and selects English or Spanish.
+2. The system checks whether NJPN is open.
+3. During open hours, English callers are connected to an available agent. Spanish callers are sent directly to Spanish voicemail.
+4. An English-speaking agent has 25 seconds to answer and then 5 seconds to press `1` to accept the caller.
+5. If the agent does not answer or press `1`, the system tries the next agent.
+6. If an agent accepts, the caller and agent are connected.
+7. If no English-speaking agent is available, the caller is sent to English voicemail.
+8. When NJPN is closed, callers hear the message for their selected language. They can press `1` to hear it again or `2` to leave a voicemail.
+9. The caller records a voicemail after the tone and presses `#` when finished. The recording is added to the related HubSpot call record when it is ready.
+
+### What agents need to do
+
+Agents should keep the HubSpot calling window open and show themselves as available while working:
+
+1. Answer within **25 seconds**.
+2. Listen to the screening message.
+3. Press **`1` within 5 seconds** to accept the caller.
+
+TODO: DO NOT HAVE NUMBERS HARDCODED
+A timeout, busy line, closed calling window, or any key other than `1` rejects the attempt. The current agent list is maintained in [twilio/functions/src/functions/multi-agent-dial.ts](twilio/functions/src/functions/multi-agent-dial.ts).
+
+## Local development and CI/CD
+
+GitHub Actions build and deploy the Twilio Functions, assets, and Studio Flow. Changes should not normally be made directly in the Production Twilio Console because the deployed configuration can drift from this repository.
+
+To build and deploy Functions manually from `twilio/functions`:
+
+```bash
+yarn install
+yarn build:ci
+yarn deploy
+```
+
+Use `yarn deploy-prod` for the Production Twilio environment after checking all environment settings.
+
+## Technologies used
 
 - Twilio Studio
 - Twilio Functions

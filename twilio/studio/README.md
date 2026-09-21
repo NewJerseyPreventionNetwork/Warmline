@@ -6,17 +6,15 @@ The flow is defined in `flows/njpn-main-ivr.json` and registered in `studio-flow
 
 ## Current call flow
 
-The flow controls this call journey:
-
-1. Plays the welcome message and asks the caller to select English or Spanish.
-2. Checks whether the service is open during the configured weekday hours.
-3. If open, logs the call to HubSpot and attempts to connect the caller to an available agent.
-4. The agent is screened and must press `1` to accept the call.
-5. If an agent answers, the caller is connected and the call ends when the bridge completes.
-6. If no agent answers, the flow tries the next available agent.
-7. If no agent is available, the caller can leave a voicemail.
-8. If the service is closed, the caller hears the relevant English or Spanish closed-hours message and can replay it or leave a voicemail.
-9. Completed voicemail recordings are sent through the recording status callback and the caller hears a completion message.
+1. The caller hears the welcome message and selects English or Spanish.
+2. The system checks whether NJPN is open.
+3. During open hours, English callers are connected to an available agent. Spanish callers are sent directly to Spanish voicemail.
+4. An English-speaking agent has 25 seconds to answer and then 5 seconds to press `1` to accept the caller.
+5. If the agent does not answer or press `1`, the system tries the next agent.
+6. If an agent accepts, the caller and agent are connected.
+7. If no English-speaking agent is available, the caller is sent to English voicemail.
+8. When NJPN is closed, callers hear the message for their selected language. They can press `1` to hear it again or `2` to leave a voicemail.
+9. The caller records a voicemail after the tone and presses `#` when finished. The recording is added to the related HubSpot call record when it is ready.
 
 ## Functions used
 
@@ -36,6 +34,4 @@ The deployment configuration replaces these flow variables during Studio deploym
 - `API_BASE_URL`: the deployed Twilio Functions service URL.
 - `HUBSPOT_NUMBER`: the HubSpot destination number.
 
-These values are supplied by the deployment pipeline for the selected environment. The flow also passes the remaining agent list between `multi-agent-dial` attempts.
-
-TO-DO: Add the mermaid-js diagram
+These values are supplied by the deployment pipeline for the selected environment.
