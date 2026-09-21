@@ -11,7 +11,6 @@
   ],
   "replaceWidgetTypes": ["set-variables"],
   "variableReplacements": {
-    "API_BASE_URL": "$API_BASE_URL",
-    "HUBSPOT_NUMBER": "$HUBSPOT_NUMBER"
+    "API_BASE_URL": "$API_BASE_URL"
   }
 }

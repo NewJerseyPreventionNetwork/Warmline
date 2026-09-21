@@ -53,4 +53,3 @@ jobs:
           TWILIO_API_SECRET: ${{ env.TWILIO_API_SECRET }}
         env:
           API_BASE_URL: ${{ vars[format('{0}_BASE_URL', inputs.ENVIRONMENT)] }}
-          HUBSPOT_NUMBER: ${{ vars[format('{0}_HUBSPOT_NUMBER', inputs.ENVIRONMENT)] }}
