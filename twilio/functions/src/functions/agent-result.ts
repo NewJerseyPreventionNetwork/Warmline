@@ -19,9 +19,7 @@ export const handler = function (
     response.hangup();
   } else {
     // Machine, timeout, busy, or rejected screening.
-    response.redirect(
-      `https://webhooks.twilio.com/v1/Accounts/ACfbfc331a01bac0921e4ae632939e5602/Flows/FW54b844fbe4093d3755d03ceecfc54bda?FlowEvent=return`,
-    );
+    response.redirect(`${context.WEBHOOK_URL}?FlowEvent=return`);
   }
 
   return callback(null, response);
