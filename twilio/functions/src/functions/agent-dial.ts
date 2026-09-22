@@ -10,8 +10,15 @@ export const handler = function (
   event: Event,
   callback: Callback,
 ) {
-  const response = new twiml.VoiceResponse();
   const agent = event.agent;
+
+  if (!isConfiguredAgent(context.AGENT_NUMBERS, agent)) {
+    const response = new twiml.VoiceResponse();
+    response.say("The requested agent is not available.");
+    return callback(null, response, 400);
+  }
+
+  const response = new twiml.VoiceResponse();
 
   const dial = response.dial({
     answerOnBridge: true,
@@ -30,3 +37,19 @@ export const handler = function (
 
   return callback(null, response);
 };
+
+function isConfiguredAgent(
+  configuredAgents: string | undefined,
+  agent: string | undefined,
+): boolean {
+  if (!configuredAgents || !agent) {
+    return false;
+  }
+
+  try {
+    const agents: unknown = JSON.parse(configuredAgents);
+    return Array.isArray(agents) && agents.includes(agent);
+  } catch {
+    return false;
+  }
+}
