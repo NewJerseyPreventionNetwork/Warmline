@@ -41,6 +41,10 @@ export const handler = async function(
             throw new Error("Invalid externalId");
         }
 
+        if (!event.jwt) {
+            return callback(null, createErrorResponse(401, "Missing token"));
+        }
+
         if (!context.SHARED_SECRET) {
             throw new Error("Missing SHARED_SECRET");
         }
@@ -55,6 +59,20 @@ export const handler = async function(
 
         if (!context.HUBSPOT_EXTERNAL_ACCOUNT_ID) {
             throw new Error("Missing HUBSPOT_EXTERNAL_ACCOUNT_ID");
+        }
+
+        const payload = jwt.verify(event.jwt, context.SHARED_SECRET) as {
+            externalId?: string;
+            appId?: string;
+            externalAccountId?: string;
+        };
+
+        if (
+            payload.externalId !== externalId ||
+            payload.appId !== context.HUBSPOT_APP_ID ||
+            payload.externalAccountId !== context.HUBSPOT_EXTERNAL_ACCOUNT_ID
+        ) {
+            return callback(null, createErrorResponse(401, "Invalid token"));
         }
 
         await context.getTwilioClient().calls(externalId).fetch();
@@ -75,14 +93,30 @@ export const handler = async function(
     } catch (err) {
         console.error(err);
         const response = new Twilio.Response();
-        response.setStatusCode(500);
+        const isJwtError =
+            err instanceof Error &&
+            (err.name === "JsonWebTokenError" ||
+                err.name === "TokenExpiredError");
+        response.setStatusCode(isJwtError ? 401 : 500);
         response.appendHeader(
             "Content-Type",
             "application/json"
         );
         response.setBody({
-            error: err instanceof Error ? err.message : String(err)
+            error: isJwtError
+                ? "Invalid or expired token"
+                : err instanceof Error
+                    ? err.message
+                    : String(err)
         });
         callback(null, response);
     }
 };
+
+function createErrorResponse(statusCode: number, message: string): Twilio.Response {
+    const response = new Twilio.Response();
+    response.setStatusCode(statusCode);
+    response.appendHeader("Content-Type", "application/json");
+    response.setBody({ error: message });
+    return response;
+}
