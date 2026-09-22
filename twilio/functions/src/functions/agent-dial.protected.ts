@@ -5,17 +5,33 @@ import type {
   Event,
 } from "@twilio-labs/serverless-runtime-types";
 
-export const handler = function (
+export const handler = async function (
   context: Context,
   event: Event,
   callback: Callback,
 ) {
   const agent = event.agent;
+  const callSid = event.CallSid;
 
   if (!isConfiguredAgent(context.AGENT_NUMBERS, agent)) {
     const response = new twiml.VoiceResponse();
     response.say("The requested agent is not available.");
     return callback(null, response, 400);
+  }
+
+  if (!isValidCallSid(callSid)) {
+    return callback(new Error("Invalid CallSid"));
+  }
+
+  try {
+    const call = await context.getTwilioClient().calls(callSid).fetch();
+
+    if (!["queued", "ringing", "in-progress"].includes(call.status)) {
+      return callback(new Error("Call is no longer active"));
+    }
+  } catch (error) {
+    console.error("Failed to validate CallSid", error);
+    return callback(new Error("Unable to validate CallSid"));
   }
 
   const response = new twiml.VoiceResponse();
@@ -37,6 +53,10 @@ export const handler = function (
 
   return callback(null, response);
 };
+
+function isValidCallSid(callSid: string | undefined): callSid is string {
+  return Boolean(callSid && /^CA[0-9a-fA-F]{32}$/.test(callSid));
+}
 
 function isConfiguredAgent(
   configuredAgents: string | undefined,
