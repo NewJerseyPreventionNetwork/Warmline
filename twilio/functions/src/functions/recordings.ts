@@ -33,24 +33,8 @@ export const handler = async function (
   try {
     const externalId = event.externalId;
 
-    if (!externalId || !/^CA[0-9a-fA-F]{32}$/.test(externalId)) {
-      throw new Error("Invalid externalId");
-    }
-
-    if (!context.SHARED_SECRET) {
-      throw new Error("Missing SHARED_SECRET");
-    }
-
-    if (!context.DOMAIN_NAME) {
-      throw new Error("Missing DOMAIN_NAME");
-    }
-
-    if (!context.HUBSPOT_APP_ID) {
-      throw new Error("Missing HUBSPOT_APP_ID");
-    }
-
-    if (!context.HUBSPOT_EXTERNAL_ACCOUNT_ID) {
-      throw new Error("Missing HUBSPOT_EXTERNAL_ACCOUNT_ID");
+    if (!externalId) {
+      throw new Error(`Missing externalId: ${JSON.stringify(event)}`);
     }
 
     const token = jwt.sign(
@@ -60,7 +44,7 @@ export const handler = async function (
         externalAccountId: context.HUBSPOT_EXTERNAL_ACCOUNT_ID,
       },
       context.SHARED_SECRET,
-      { expiresIn: "10m" },
+      { expiresIn: "1h" },
     );
 
     callback(null, {
