@@ -53,6 +53,10 @@ export const handler = async function (
       throw new Error("Missing SHARED_SECRET");
     }
 
+    if (!context.HUBSPOT_CLIENT_SECRET) {
+      throw new Error("Missing HUBSPOT_CLIENT_SECRET");
+    }
+
     if (!context.DOMAIN_NAME) {
       throw new Error("Missing DOMAIN_NAME");
     }
@@ -66,21 +70,7 @@ export const handler = async function (
     }
 
     try {
-      const payload = jwt.verify(event.jwt, context.SHARED_SECRET) as {
-        appId?: string;
-        externalAccountId?: string;
-      };
-
-      if (
-        payload.appId !== context.HUBSPOT_APP_ID ||
-        payload.externalAccountId !== context.HUBSPOT_EXTERNAL_ACCOUNT_ID
-      ) {
-        const response = new Twilio.Response();
-        response.setStatusCode(401);
-        response.appendHeader("Content-Type", "application/json");
-        response.setBody({ error: "Invalid token" });
-        return callback(null, response);
-      }
+      jwt.verify(event.jwt, context.HUBSPOT_CLIENT_SECRET);
     } catch (err) {
       if (
         err instanceof Error &&
