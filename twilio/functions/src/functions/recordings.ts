@@ -41,6 +41,14 @@ export const handler = async function (
       throw new Error("Invalid externalId");
     }
 
+    if (!event.jwt) {
+      const response = new Twilio.Response();
+      response.setStatusCode(401);
+      response.appendHeader("Content-Type", "application/json");
+      response.setBody({ error: "Missing token" });
+      return callback(null, response);
+    }
+
     if (!context.SHARED_SECRET) {
       throw new Error("Missing SHARED_SECRET");
     }
@@ -55,6 +63,37 @@ export const handler = async function (
 
     if (!context.HUBSPOT_EXTERNAL_ACCOUNT_ID) {
       throw new Error("Missing HUBSPOT_EXTERNAL_ACCOUNT_ID");
+    }
+
+    try {
+      const payload = jwt.verify(event.jwt, context.SHARED_SECRET) as {
+        appId?: string;
+        externalAccountId?: string;
+      };
+
+      if (
+        payload.appId !== context.HUBSPOT_APP_ID ||
+        payload.externalAccountId !== context.HUBSPOT_EXTERNAL_ACCOUNT_ID
+      ) {
+        const response = new Twilio.Response();
+        response.setStatusCode(401);
+        response.appendHeader("Content-Type", "application/json");
+        response.setBody({ error: "Invalid token" });
+        return callback(null, response);
+      }
+    } catch (err) {
+      if (
+        err instanceof Error &&
+        (err.name === "JsonWebTokenError" || err.name === "TokenExpiredError")
+      ) {
+        const response = new Twilio.Response();
+        response.setStatusCode(401);
+        response.appendHeader("Content-Type", "application/json");
+        response.setBody({ error: "Invalid token" });
+        return callback(null, response);
+      }
+
+      throw err;
     }
 
     await context.getTwilioClient().calls(externalId).fetch();
