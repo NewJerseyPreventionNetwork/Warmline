@@ -40,13 +40,16 @@ export const handler = async function (
 
     const callSid = event.CallSid;
 
-    if (
-      !callSid ||
-      !/^CA[0-9a-fA-F]{32}$/.test(callSid) ||
-      !context.HUBSPOT_APP_ID ||
-      !context.HUBSPOT_EXTERNAL_ACCOUNT_ID
-    ) {
-      throw new Error("Missing CallSid");
+    if (!callSid || !/^CA[0-9a-fA-F]{32}$/.test(callSid)) {
+      throw new Error("Missing or invalid CallSid");
+    }
+
+    if (!context.HUBSPOT_APP_ID) {
+      throw new Error("Missing HUBSPOT_APP_ID");
+    }
+
+    if (!context.HUBSPOT_EXTERNAL_ACCOUNT_ID) {
+      throw new Error("Missing HUBSPOT_EXTERNAL_ACCOUNT_ID");
     }
 
     console.log("Validating Twilio call:", callSid);
