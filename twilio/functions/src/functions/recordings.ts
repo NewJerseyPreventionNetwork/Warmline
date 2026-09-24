@@ -15,6 +15,8 @@ type RuntimeContext = Record<string, string | undefined> & {
 };
 type RecordingEvent = {
   externalId?: string;
+  appId?: string;
+  externalAccountId?: string;
   jwt?: string;
   request?: {
     headers?: {
@@ -55,6 +57,17 @@ export const handler = async function (
 
     if (!context.HUBSPOT_EXTERNAL_ACCOUNT_ID) {
       throw new Error("Missing HUBSPOT_EXTERNAL_ACCOUNT_ID");
+    }
+
+    if (
+      event.appId !== context.HUBSPOT_APP_ID ||
+      event.externalAccountId !== context.HUBSPOT_EXTERNAL_ACCOUNT_ID
+    ) {
+      const response = new Twilio.Response();
+      response.setStatusCode(401);
+      response.appendHeader("Content-Type", "application/json");
+      response.setBody({ error: "Unauthorized" });
+      return callback(null, response);
     }
 
     await context.getTwilioClient().calls(externalId).fetch();
