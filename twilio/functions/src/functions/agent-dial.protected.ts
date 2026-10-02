@@ -14,9 +14,7 @@ export const handler = async function (
   const callSid = event.CallSid;
 
   if (!isConfiguredAgent(context.AGENT_NUMBERS, agent)) {
-    const response = new twiml.VoiceResponse();
-    response.say("The requested agent is not available.");
-    return callback(null, response, 400);
+    return callback(new Error("Requested agent is not configured"));
   }
 
   if (!isValidCallSid(callSid)) {
