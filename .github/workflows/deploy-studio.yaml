@@ -27,7 +27,7 @@ env:
 
 jobs:
   deploy_studio:
-    if: inputs.ENVIRONMENT == 'Develop' || github.triggering_actor == 'zing-devops'
+    environment: ${{ inputs.ENVIRONMENT }}
     runs-on: ubuntu-24.04
 
     steps:
