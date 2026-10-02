@@ -3,20 +3,14 @@
   "enableShellVariables": true,
   "flows": [
     {
-      "name": "NJPN - Main IVR",
+      "name": "NJPN IVR no-county",
       "path": "twilio/studio/flows/njpn-main-ivr.json",
       "subflow": false,
       "allowCreate": true
     }
   ],
-  "replaceWidgetTypes": [
-    "run-function"
-  ],
-  "functionServices": [
-    {
-      "name": "njpn-api",
-      "environmentSuffix": 0,
-      "pattern": false
-    }
-  ]
+  "replaceWidgetTypes": ["set-variables"],
+  "variableReplacements": {
+    "API_BASE_URL": "$API_BASE_URL"
+  }
 }

@@ -1,0 +1,38 @@
+name: Validate Studio Flows
+run-name: Validate Studio Flows for ${{ inputs.ENVIRONMENT }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      ENVIRONMENT:
+        description: Environment to validate against
+        default: Develop
+        type: choice
+        options:
+          - Develop
+          - Production
+
+permissions:
+  contents: read
+
+env:
+  TWILIO_API_KEY: ${{ vars[format('{0}_TWILIO_API_KEY', inputs.ENVIRONMENT)] }}
+  TWILIO_API_SECRET: ${{ secrets[format('{0}_TWILIO_API_SECRET', inputs.ENVIRONMENT)] }}
+
+jobs:
+  validate_studio:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            twilio/studio
+
+      - name: Validate Studio Flows
+        uses: zingdevlimited/studio-flow-actions/validate@v1
+        with:
+          CONFIG_PATH: twilio/studio/studio-flows.config.json
+          TWILIO_API_KEY: ${{ env.TWILIO_API_KEY }}
+          TWILIO_API_SECRET: ${{ env.TWILIO_API_SECRET }}
