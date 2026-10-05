@@ -20,7 +20,8 @@ If you are setting up or deploying the service, follow these sections in order:
 3. [Prepare GitHub Actions](#prepare-github-actions)
 4. [Deploy the Functions Service](#deploy-the-functions-service)
 5. [Deploy the Studio Flows](#deploy-the-studio-flows)
-6. [Test the deployment](#test-the-deployment)
+6. [Configure the Twilio phone number](#configure-the-twilio-phone-number)
+7. [Test the deployment](#test-the-deployment)
 
 ## Repository structure
 
