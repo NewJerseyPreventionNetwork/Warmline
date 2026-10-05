@@ -112,31 +112,31 @@ Repository variables and secrets are configured under:
 
 Secrets must be stored as GitHub **secrets** and must not be committed to the repository.
 
-## Deploy the Functions Service
+## Deploy the Studio Flows
 
-Functions and assets are deployed together as one Twilio Functions Service.
+The Main and Fallback Studio Flow definitions are stored under `twilio/studio/flows` and are configured in `twilio/studio/studio-flows.config.json`.
 
-### Development
+The Studio workflows use this configuration to determine which flows should be synced, validated and deployed.
 
-1. In GitHub, go to **Actions → Build Functions → Run workflow**, select the branch containing the changes and run the workflow.
-2. Once the build succeeds, go to **Actions → Deploy Functions → Run workflow**.
-3. Select the same branch and choose `Develop` as the environment.
-4. Run the workflow and confirm the deployment succeeds.
+### Development workflow
 
-This builds the TypeScript Functions and assets and deploys them to the Development Twilio Functions Service.
+1. Make and test the Studio changes in the Development Twilio account.
+2. Run **Sync Studio Flows** for `Develop`. This syncs the configured Studio Flows from Twilio into the repository.
+3. Review the PR created by the Sync workflow and merge it once the changes are correct.
+4. Run **Validate Studio Flows** and select `Develop`.
+5. Run **Deploy Studio Flows** and select `Develop`.
+6. Test the complete call journeys in Development.
 
-### Production
+### Production workflow
 
-Once the changes have been tested and reviewed in Development:
+Once the changes have been reviewed and tested in Development:
 
 1. Ensure the changes being released have been merged into `main`.
-2. In GitHub, go to **Actions → Build Functions → Run workflow**, select `main` and run the workflow.
-3. Once the build succeeds, go to **Actions → Deploy Functions → Run workflow**.
-4. Select `main` and choose `Production` as the environment.
-5. Run the workflow and confirm the deployment succeeds.
-6. Confirm the Production Functions Service contains the required environment variables.
+2. Run **Validate Studio Flows** and select `Production`.
+3. Once validation succeeds, run **Deploy Studio Flows** and select `Production`.
+4. Test both Production call journeys.
 
-Production should only be deployed from the reviewed and tested version in `main`.
+A Production sync is not normally required during deployment. **Sync pulls the current Studio Flow definitions from Twilio into the repository, whereas Deploy pushes the repository Flow definitions to Twilio.**
 
 ## Deploy the Studio Flows
 
