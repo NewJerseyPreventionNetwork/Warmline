@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   deploy_functions:
-    uses: zingdevlimited/actions-helpers/.github/workflows/deploy-twilio-functions.yaml@v4
+    uses: zingdevlimited/actions-helpers/.github/workflows/deploy-twilio-functions.yaml@v5.2.0
 
     with:
       SERVICE_DIRECTORY: twilio/functions
