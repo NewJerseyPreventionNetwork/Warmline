@@ -1,36 +1,96 @@
-## Studio
+# Studio
 
-The `studio` directory contains the configuration for the current Twilio Studio Flow, `NJPN IVR no-county`, used by the NJPN IVR.
+The `studio` directory contains the Twilio Studio Flow definitions used by the NJPN incoming phone service.
 
-The flow is defined in `flows/njpn-main-ivr.json` and registered in `studio-flows.config.json`.
+There are two Studio Flows:
 
-## Current call flow
+- `NJPN Main IVR` – the primary flow, used when county routing is available.
+- `NJPN Fallback IVR` – the fallback flow, used when county routing is unavailable.
 
-1. The caller hears the welcome message and selects English or Spanish.
-2. The system checks whether NJPN is open.
-3. During open hours, English callers are connected to an available agent. Spanish callers are sent directly to Spanish voicemail.
-4. An English-speaking agent has 25 seconds to answer and then 5 seconds to press `1` to accept the caller.
-5. If the agent does not answer or press `1`, the system tries the next agent.
-6. If an agent accepts, the caller and agent are connected.
-7. If no English-speaking agent is available, the caller is sent to English voicemail.
-8. When NJPN is closed, callers hear the message for their selected language. They can press `1` to hear it again or `2` to leave a voicemail.
-9. The caller records a voicemail after the tone and presses `#` when finished. The recording is added to the related HubSpot call record when it is ready.
+Both flows are registered in `studio-flows.config.json`.
 
-## Functions used
+## NJPN Main IVR
 
-The flow calls these Function routes through `API_BASE_URL`:
+The Main IVR allows callers to be routed based on their selected language and, during opening hours, their county or preferred representative.
 
-- `/opening_hours`
-- `/log-call-to-hubspot`
-- `/multi-agent-dial`
-- `/agent-dial`
+### English
 
-The agent functions call `/agent-screen`, `/agent-screen-result`, and `/agent-result` as part of the screening and bridge process.
+During opening hours:
 
-## Deployment variables
+1. The caller selects English.
+2. The caller can say their county or request a representative.
+3. If a county is provided, the caller is connected to the relevant county number.
+4. If a representative is requested, the caller is routed to an available HubSpot agent.
+5. If the HubSpot agent journey cannot connect the caller, the caller is sent to voicemail.
 
-The deployment configuration replaces these flow variables during Studio deployment:
+Outside opening hours, the caller is sent through the out-of-hours journey and can leave a voicemail.
 
-- `API_BASE_URL`: the deployed Twilio Functions service URL.
+### Spanish
 
-This value is supplied by the deployment pipeline for the selected environment.
+During opening hours:
+
+1. The caller selects Spanish.
+2. The caller can say their county or request to leave a voicemail.
+3. If a county is provided, the caller is connected to the relevant county number.
+4. If voicemail is requested, the caller is sent to the Spanish voicemail journey.
+
+Outside opening hours, the caller is sent through the Spanish out-of-hours journey and can leave a voicemail.
+
+## NJPN Fallback IVR
+
+The Fallback IVR is used when county routing is unavailable. It removes the county routing journey while keeping the service available through HubSpot and voicemail.
+
+### English
+
+During opening hours:
+
+1. The caller selects English.
+2. The caller is routed directly to an available HubSpot agent.
+3. If an agent does not accept the call, the system attempts the next available agent.
+4. If no agent accepts the call, the caller is sent to English voicemail.
+
+Outside opening hours, the caller is sent through the English out-of-hours journey and can leave a voicemail.
+
+### Spanish
+
+Spanish callers are sent to the Spanish voicemail journey rather than HubSpot agent routing.
+
+The appropriate in-hours or out-of-hours message is played before the caller is given the option to leave a voicemail.
+
+## HubSpot agent routing
+
+Where a flow routes an English caller to HubSpot agents:
+
+1. An agent has 25 seconds to answer the incoming call.
+2. After answering, the agent hears a screening message.
+3. The agent has 5 seconds to press `1` to accept the caller.
+4. If accepted, the caller and agent are connected.
+5. If the attempt is not accepted, the flow can try the next available agent.
+6. If no agent accepts the call, the caller is sent to voicemail.
+
+The Functions used to manage agent selection, screening and call bridging are documented in the Functions README.
+
+## Voicemail
+
+Both flows use Twilio voicemail for journeys where the caller cannot or does not need to be connected directly.
+
+The caller records their message after the tone and presses `#` when finished.
+
+Once the recording is ready, the integration makes it available from the associated HubSpot call record.
+
+## Studio configuration
+
+The Studio Flow definitions are stored under:
+
+```text
+twilio/studio/
+├── flows/
+│   ├── njpn-main-ivr.json
+│   └── njpn-fallback-ivr.json
+├── studio-flows.config.json
+└── README.md
+```
+
+Both flows are registered in `studio-flows.config.json`. This configuration is used by the Studio Sync, Validate and Deploy workflows.
+
+The configuration also replaces `API_BASE_URL` during deployment with the Functions Service URL for the selected environment.
