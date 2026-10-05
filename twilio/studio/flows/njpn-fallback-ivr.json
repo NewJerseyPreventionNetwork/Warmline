@@ -196,7 +196,7 @@
           "x": -2041,
           "y": 1913
         },
-        "recording_status_callback_url": "https://njpn-7517.twil.io/recording-status-callback",
+        "recording_status_callback_url": "{{flow.variables.API_BASE_URL}}/recording-status-callback",
         "timeout": 60
       }
     },
@@ -257,7 +257,9 @@
           "conditions": [
             {
               "friendly_name": "If value less_than 3",
-              "arguments": ["{{flow.variables.invalid_counter}}"],
+              "arguments": [
+                "{{flow.variables.invalid_counter}}"
+              ],
               "type": "less_than",
               "value": "3"
             }
@@ -286,7 +288,9 @@
           "conditions": [
             {
               "friendly_name": "If value less_than 3",
-              "arguments": ["{{flow.variables.invalid_counter}}"],
+              "arguments": [
+                "{{flow.variables.invalid_counter}}"
+              ],
               "type": "less_than",
               "value": "3"
             }
@@ -564,7 +568,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to 1",
-              "arguments": ["{{widgets.invalid_option.Digits}}"],
+              "arguments": [
+                "{{widgets.invalid_option.Digits}}"
+              ],
               "type": "equal_to",
               "value": "1"
             }
@@ -576,7 +582,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to 2",
-              "arguments": ["{{widgets.invalid_option.Digits}}"],
+              "arguments": [
+                "{{widgets.invalid_option.Digits}}"
+              ],
               "type": "equal_to",
               "value": "2"
             }
@@ -605,7 +613,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to 1",
-              "arguments": ["{{widgets.invalid_option.Digits}}"],
+              "arguments": [
+                "{{widgets.invalid_option.Digits}}"
+              ],
               "type": "equal_to",
               "value": "1"
             }
@@ -617,7 +627,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to 2",
-              "arguments": ["{{widgets.invalid_option.Digits}}"],
+              "arguments": [
+                "{{widgets.invalid_option.Digits}}"
+              ],
               "type": "equal_to",
               "value": "2"
             }
@@ -646,7 +658,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to true",
-              "arguments": ["{{widgets.check_hours.parsed.open}}"],
+              "arguments": [
+                "{{widgets.check_hours.parsed.open}}"
+              ],
               "type": "equal_to",
               "value": "true"
             }
@@ -675,7 +689,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to true",
-              "arguments": ["{{widgets.check_hours_english.parsed.open}}"],
+              "arguments": [
+                "{{widgets.check_hours_english.parsed.open}}"
+              ],
               "type": "equal_to",
               "value": "true"
             }
@@ -834,7 +850,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to 1",
-              "arguments": ["{{widgets.closed_message_english.Digits}}"],
+              "arguments": [
+                "{{widgets.closed_message_english.Digits}}"
+              ],
               "type": "equal_to",
               "value": "1"
             }
@@ -846,7 +864,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to 2",
-              "arguments": ["{{widgets.closed_message_english.Digits}}"],
+              "arguments": [
+                "{{widgets.closed_message_english.Digits}}"
+              ],
               "type": "equal_to",
               "value": "2"
             }
@@ -875,7 +895,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to 1",
-              "arguments": ["{{widgets.closed_message_english.Digits}}"],
+              "arguments": [
+                "{{widgets.closed_message_english.Digits}}"
+              ],
               "type": "equal_to",
               "value": "1"
             }
@@ -887,7 +909,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to 2",
-              "arguments": ["{{widgets.closed_message_english.Digits}}"],
+              "arguments": [
+                "{{widgets.closed_message_english.Digits}}"
+              ],
               "type": "equal_to",
               "value": "2"
             }
@@ -1069,7 +1093,9 @@
           "conditions": [
             {
               "friendly_name": "If value less_than 3",
-              "arguments": ["{{flow.variables.language_counter}}"],
+              "arguments": [
+                "{{flow.variables.language_counter}}"
+              ],
               "type": "less_than",
               "value": "3"
             }
@@ -1098,7 +1124,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to true",
-              "arguments": ["{{flow.variables.lastAgent}}"],
+              "arguments": [
+                "{{flow.variables.lastAgent}}"
+              ],
               "type": "equal_to",
               "value": "true"
             }
@@ -1126,7 +1154,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to 1",
-              "arguments": ["{{widgets.gather_language.Digits}}"],
+              "arguments": [
+                "{{widgets.gather_language.Digits}}"
+              ],
               "type": "equal_to",
               "value": "1"
             }
@@ -1138,7 +1168,9 @@
           "conditions": [
             {
               "friendly_name": "If value equal_to 2",
-              "arguments": ["{{widgets.gather_language.Digits}}"],
+              "arguments": [
+                "{{widgets.gather_language.Digits}}"
+              ],
               "type": "equal_to",
               "value": "2"
             }
@@ -1159,7 +1191,7 @@
       "transitions": [
         {
           "event": "next",
-          "next": "welcome_msg"
+          "next": "closed_message_english"
         }
       ],
       "properties": {
