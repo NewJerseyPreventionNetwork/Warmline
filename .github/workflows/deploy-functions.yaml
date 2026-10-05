@@ -11,6 +11,12 @@ on:
         options:
           - Develop
           - Production
+        required: true
+
+      UI_EDITABLE:
+        type: boolean
+        default: false
+        required: true
 
 permissions:
   contents: read
@@ -25,7 +31,7 @@ jobs:
       BUILD_WORKFLOW_NAME: build-functions.yaml
       TWILIO_ACCOUNT_SID: ${{ vars[format('{0}_TWILIO_ACCOUNT_SID', inputs.ENVIRONMENT)] }}
       TWILIO_API_KEY: ${{ vars[format('{0}_TWILIO_API_KEY', inputs.ENVIRONMENT)] }}
-      UI_EDITABLE: false
+      UI_EDITABLE: ${{ inputs.UI_EDITABLE }}
 
     secrets:
       TWILIO_API_SECRET: ${{ secrets[format('{0}_TWILIO_API_SECRET', inputs.ENVIRONMENT)] }}
