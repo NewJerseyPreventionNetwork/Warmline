@@ -18,10 +18,9 @@ If you are setting up or deploying the service, follow these sections in order:
 1. [Understand the repository](#repository-structure)
 2. [Configure HubSpot and Twilio](#configure-hubspot-and-twilio)
 3. [Prepare GitHub Actions](#prepare-github-actions)
-4. [Deploy the Functions Service](#deploy-the-functions-service)
-5. [Deploy the Studio Flows](#deploy-the-studio-flows)
+4. [Deploy the Studio Flows](#deploy-the-studio-flows)
+5. [Deploy the Functions Service](#deploy-the-functions-service)
 6. [Configure the Twilio phone number](#configure-the-twilio-phone-number)
-7. [Test the deployment](#test-the-deployment)
 
 ## Repository structure
 
@@ -139,37 +138,35 @@ Once the changes have been reviewed and tested in Development:
 
 A Production sync is not normally required during deployment. **Sync pulls the current Studio Flow definitions from Twilio into the repository, whereas Deploy pushes the repository Flow definitions to Twilio.**
 
-## Deploy the Studio Flows
+## Deploy the Functions Service
 
-Studio Flow definitions are stored under `twilio/studio`.
+The Twilio Functions and assets are stored under `twilio/functions` and are deployed together as a single Twilio Functions Service.
 
 ### Development workflow
 
-1. Make and test the Studio changes in the Development Twilio account.
-2. Run **Sync Studio Flows** for `Develop`.
-3. Review the PR created by the Sync workflow and merge it once the changes are correct.
-4. Run **Validate Studio Flows** and select `Develop`.
-5. Run **Deploy Studio Flows** and select `Develop`.
-6. Test the complete call journey in Development.
+1. In GitHub, go to **Actions → Build Functions → Run workflow**.
+2. Select the branch containing the changes and run the workflow.
+3. Once the build succeeds, go to **Actions → Deploy Functions → Run workflow**.
+4. Select the same branch and choose `Develop` as the environment.
+5. Run the workflow and confirm the deployment succeeds.
+6. Confirm the required Development environment variables are configured on the deployed Functions Service.
+7. Test the Functions and relevant call journeys in Development.
 
 ### Production workflow
 
 Once the changes have been reviewed and tested in Development:
 
 1. Ensure the changes being released have been merged into `main`.
-2. Run **Validate Studio Flows** and select `Production`.
-3. Once validation succeeds, run **Deploy Studio Flows** and select `Production`.
-4. Test the Production call journey.
+2. Go to **Actions → Build Functions → Run workflow**, select `main` and run the workflow.
+3. Once the build succeeds, go to **Actions → Deploy Functions → Run workflow**.
+4. Select `main` and choose `Production` as the environment.
+5. Run the workflow and confirm the deployment succeeds.
+6. Add or confirm the required Production environment variables on the deployed Functions Service.
+7. Test the Functions as part of the Production call journey.
 
-Do not sync Production immediately before a deployment unless you specifically intend to bring changes made in the Production Twilio Console back into the repository.
+The Functions Service and Studio Flows must use the same environment. Do not connect a Development Studio Flow to the Production Functions Service, or vice versa.
 
-The **Deploy Studio Flows** workflow selects the values for the chosen environment and applies them to the Studio Flow using [twilio/studio/studio-flows.config.json](twilio/studio/studio-flows.config.json).
-
-| Studio Flow value | Filled from |
-| --- | --- |
-| `API_BASE_URL` | `Develop_BASE_URL` or `Production_BASE_URL` |
-
-These values are applied when the Studio Flow is deployed. They should not normally need to be entered manually in the Studio Console.
+Functions and assets deployed through the pipeline should be treated as repository-managed. Avoid making manual changes to them in the Twilio Console.
 
 ## Configure the Twilio phone number
 
