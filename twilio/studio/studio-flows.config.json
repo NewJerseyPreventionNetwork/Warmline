@@ -3,8 +3,14 @@
   "enableShellVariables": true,
   "flows": [
     {
-      "name": "NJPN IVR no-county",
+      "name": "Main IVR",
       "path": "twilio/studio/flows/njpn-main-ivr.json",
+      "subflow": false,
+      "allowCreate": true
+    },
+    {
+      "name": "Fallback IVR",
+      "path": "twilio/studio/flows/njpn-fallback-ivr.json",
       "subflow": false,
       "allowCreate": true
     }
