@@ -170,6 +170,24 @@ The **Deploy Studio Flows** workflow selects the values for the chosen environme
 
 These values are applied when the Studio Flow is deployed. They should not normally need to be entered manually in the Studio Console.
 
+## Configure the Twilio phone number
+
+Once the Production Functions Service and Studio Flows have been deployed, configure the NJPN incoming phone number.
+
+If a number has not already been purchased:
+
+1. In the NJPN Twilio Console, go to **Phone Numbers → Manage → Buy a number**.
+2. Search for a United States local number with **Voice** capability.
+3. Select the required New Jersey number and purchase it.
+4. Open the purchased number under **Phone Numbers → Manage → Active numbers**.
+5. Under the incoming Voice configuration, set **A call comes in** to `Studio Flow`.
+6. Select the Studio Flow that should currently handle incoming NJPN calls.
+7. Save the configuration.
+
+`NJPN Main IVR` should be selected when county routing is available. `NJPN Fallback IVR` can be selected when the county routing journey is unavailable.
+
+The phone number determines which Studio Flow is live. Both flows can remain deployed while the incoming number points to the required flow.
+
 ## What agents need to do in HubSpot
 
 Agents should keep the HubSpot calling window open and show themselves as available while working.
