@@ -43,7 +43,7 @@
           "x": 510,
           "y": 562
         },
-        "play": "{{flow.variables.API_BASE_URL}}/check_failed1.mp3"
+        "play": "{{flow.variables.API_BASE_URL}}/check_failed.mp3"
       }
     },
     {
@@ -57,8 +57,8 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": 2438,
-          "y": 757
+          "x": 2624,
+          "y": 2325
         },
         "play": "{{flow.variables.API_BASE_URL}}/check_failed_spanish.mp3"
       }
@@ -84,7 +84,7 @@
           "x": 39,
           "y": 52
         },
-        "url": "{{flow.variables.API_BASE_URL}}/opening_hours"
+        "url": "https://babied-dingbat-marmalade.ngrok-free.dev/opening_hours"
       }
     },
     {
@@ -117,14 +117,14 @@
       "transitions": [
         {
           "event": "keypress",
-          "next": "invalid_counter"
+          "next": "repeat_or_voicemail"
         },
         {
           "event": "speech"
         },
         {
           "event": "timeout",
-          "next": "invalid_counter"
+          "next": "invalid_add"
         }
       ],
       "properties": {
@@ -149,14 +149,14 @@
       "transitions": [
         {
           "event": "keypress",
-          "next": "invalid_counter_spanish"
+          "next": "repeat_or_voicemail_spanish"
         },
         {
           "event": "speech"
         },
         {
           "event": "timeout",
-          "next": "invalid_counter_spanish"
+          "next": "invalid_add_spanish"
         }
       ],
       "properties": {
@@ -227,29 +227,12 @@
       }
     },
     {
-      "name": "disconnect",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": -3442,
-          "y": 1609
-        },
-        "play": "{{flow.variables.API_BASE_URL}}/disconnect1.mp3"
-      }
-    },
-    {
       "name": "disconnect_or_continue",
       "type": "split-based-on",
       "transitions": [
         {
           "event": "noMatch",
-          "next": "disconnect"
+          "next": "check_failed"
         },
         {
           "event": "match",
@@ -280,7 +263,7 @@
       "transitions": [
         {
           "event": "noMatch",
-          "next": "disconnect_spanish"
+          "next": "check_failed_spanish"
         },
         {
           "event": "match",
@@ -303,23 +286,6 @@
           "x": 1022,
           "y": 2041
         }
-      }
-    },
-    {
-      "name": "disconnect_spanish",
-      "type": "say-play",
-      "transitions": [
-        {
-          "event": "audioComplete"
-        }
-      ],
-      "properties": {
-        "loop": 1,
-        "offset": {
-          "x": 955,
-          "y": 2307
-        },
-        "play": "{{flow.variables.API_BASE_URL}}/disconnect_spanish1.mp3"
       }
     },
     {
@@ -347,7 +313,7 @@
           "x": 954,
           "y": -571
         },
-        "play": "{{flow.variables.API_BASE_URL}}/select-spanish.mp3",
+        "play": "{{flow.variables.API_BASE_URL}}/select_spanish.mp3",
         "speech_model": "default",
         "speech_timeout": "5",
         "stop_gather": false,
@@ -378,7 +344,7 @@
       "transitions": [
         {
           "event": "return",
-          "next": "split_3"
+          "next": "last_agent_split"
         },
         {
           "event": "timeout",
@@ -451,13 +417,13 @@
       "transitions": [
         {
           "event": "next",
-          "next": "repeat_or_voicemail"
+          "next": "closed_message_english"
         }
       ],
       "properties": {
         "offset": {
-          "x": -1239,
-          "y": 885
+          "x": -875,
+          "y": 319
         },
         "variables": [
           {
@@ -474,13 +440,13 @@
       "transitions": [
         {
           "event": "next",
-          "next": "repeat_or_voicemail_spanish"
+          "next": "closed_message_spanish"
         }
       ],
       "properties": {
         "offset": {
-          "x": 1512,
-          "y": 1454
+          "x": 1111,
+          "y": 883
         },
         "variables": [
           {
@@ -650,7 +616,7 @@
       "transitions": [
         {
           "event": "noMatch",
-          "next": "closed_message_english"
+          "next": "invalid_counter"
         },
         {
           "event": "match",
@@ -681,7 +647,7 @@
       "transitions": [
         {
           "event": "noMatch",
-          "next": "closed_message_spanish"
+          "next": "invalid_counter_spanish"
         },
         {
           "event": "match",
@@ -717,10 +683,41 @@
       "properties": {
         "loop": 1,
         "offset": {
-          "x": 2304,
-          "y": -233
+          "x": 1655,
+          "y": 96
         },
-        "play": "{{flow.variables.API_BASE_URL}}/disconnect1.mp3"
+        "play": "{{flow.variables.API_BASE_URL}}/disconnect.mp3"
+      }
+    },
+    {
+      "name": "last_agent_split",
+      "type": "split-based-on",
+      "transitions": [
+        {
+          "event": "noMatch",
+          "next": "multi_agent_dial"
+        },
+        {
+          "event": "match",
+          "next": "send_to_voicemail_message",
+          "conditions": [
+            {
+              "friendly_name": "If value equal_to true",
+              "arguments": [
+                "{{flow.variables.lastAgent}}"
+              ],
+              "type": "equal_to",
+              "value": "true"
+            }
+          ]
+        }
+      ],
+      "properties": {
+        "input": "{{flow.variables.lastAgent}}",
+        "offset": {
+          "x": -564,
+          "y": 1742
+        }
       }
     },
     {
@@ -921,8 +918,8 @@
       "properties": {
         "input": "{{widgets.closed_message_spanish.Digits}}",
         "offset": {
-          "x": 715,
-          "y": 1486
+          "x": 816,
+          "y": 1341
         }
       }
     },
@@ -942,7 +939,7 @@
           "x": 883,
           "y": -822
         },
-        "play": "{{flow.variables.API_BASE_URL}}/select-english.mp3"
+        "play": "{{flow.variables.API_BASE_URL}}/select_english.mp3"
       }
     },
     {
@@ -979,7 +976,7 @@
           "x": 2119,
           "y": 1131
         },
-        "play": "{{flow.variables.API_BASE_URL}}/send_to_voicemail_spanish.mp3"
+        "play": "{{flow.variables.API_BASE_URL}}/fallback/send_to_voicemail_spanish.mp3"
       }
     },
     {
@@ -1111,37 +1108,6 @@
       }
     },
     {
-      "name": "split_3",
-      "type": "split-based-on",
-      "transitions": [
-        {
-          "event": "noMatch",
-          "next": "multi_agent_dial"
-        },
-        {
-          "event": "match",
-          "next": "send_to_voicemail_message",
-          "conditions": [
-            {
-              "friendly_name": "If value equal_to true",
-              "arguments": [
-                "{{flow.variables.lastAgent}}"
-              ],
-              "type": "equal_to",
-              "value": "true"
-            }
-          ]
-        }
-      ],
-      "properties": {
-        "input": "{{flow.variables.lastAgent}}",
-        "offset": {
-          "x": -564,
-          "y": 1742
-        }
-      }
-    },
-    {
       "name": "split_language",
       "type": "split-based-on",
       "transitions": [
@@ -1191,7 +1157,7 @@
       "transitions": [
         {
           "event": "next",
-          "next": "closed_message_english"
+          "next": "welcome_msg"
         }
       ],
       "properties": {
@@ -1261,7 +1227,7 @@
           "x": 1051,
           "y": -1294
         },
-        "play": "{{flow.variables.API_BASE_URL}}/opening-message.mp3"
+        "play": "{{flow.variables.API_BASE_URL}}/opening_message.mp3"
       }
     }
   ],
