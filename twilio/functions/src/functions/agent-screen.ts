@@ -14,16 +14,15 @@ export const handler = function (
 
   const gather = response.gather({
     action: `https://${context.DOMAIN_NAME}/agent-screen-result`,
+    actionOnEmptyResult: true,
     method: "POST",
     numDigits: 1,
-    timeout: 5,
+    timeout: 10,
   });
 
   gather.say(
-    "Press 1 to accept this caller. If you do not press 1, the call will be declined.",
+    "Press 1 to accept this call. If you do not press 1, the call will be declined.",
   );
-
-  response.hangup();
 
   return callback(null, response);
 };
