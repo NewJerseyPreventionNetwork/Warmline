@@ -58,6 +58,7 @@ Before using the service:
 - Agents receiving calls should keep the HubSpot calling window open and show themselves as available.
 - A HubSpot **Super Admin is required to view and play recordings** in the current setup.
 - Do not configure HubSpot voicemail on the agent numbers used by this service. Unanswered calls need to return to Twilio so that the Twilio voicemail journey can run.
+- Disable transcription in both **Call Setup** and **Notetaker settings**. If transcription is enabled in either location, recordings may not appear correctly in HubSpot. This change only applies to calls made after the setting is disabled; it will not make recordings from previous calls appear.
 
 The HubSpot app used by this integration has already been created. Its configuration can be found in HubSpot under **Development > Projects**.
 
