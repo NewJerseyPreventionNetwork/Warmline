@@ -1,15 +1,14 @@
 import { twiml } from "twilio";
 import type {
+    Callback,
     Context,
-    EnvironmentVariables,
-    ServerlessCallback,
-    ServerlessEventObject,
-} from "@twilio-labs/serverless-runtime-types/types";
+    Event,
+} from "@twilio-labs/serverless-runtime-types";
 
 export const handler = function (
-    _context: Context<EnvironmentVariables>,
-    _event: ServerlessEventObject<Record<string, any>>,
-    callback: ServerlessCallback,
+    _context: Context,
+    _event: Event,
+    callback: Callback,
 ) {
     const response = new twiml.VoiceResponse();
     response.say(
