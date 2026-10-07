@@ -32,7 +32,6 @@ export const handler = async function (
     union: context.UNION_NUMBER,
     warren: context.WARREN_NUMBER,
     "cabo may": context.CAPE_MAY_NUMBER,
-    representative: context.REPRESENTATIVE_NUMBER,
   };
 
   const spokenCounty = (event.county || "").toLowerCase().trim();
