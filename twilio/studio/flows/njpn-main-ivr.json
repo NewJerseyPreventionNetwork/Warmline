@@ -461,8 +461,8 @@
         "gather_language": "en",
         "loop": 1,
         "offset": {
-          "x": 2743,
-          "y": 1936
+          "x": 2744,
+          "y": 1948
         },
         "play": "{{flow.variables.API_BASE_URL}}/main/county_areas_spanish.mp3",
         "speech_model": "default",
@@ -1681,7 +1681,7 @@
             "value": "{{widgets.county_areas_spanish.Digits}}"
           }
         ],
-        "url": "{{flow.variables.API_BASE_URL}}/county_mapping"
+        "url": "{{flow.variables.API_BASE_URL}}/county_mapping_spanish"
       }
     },
     {
@@ -2337,7 +2337,7 @@
         },
         {
           "event": "match",
-          "next": "set_counter_spanish",
+          "next": "gather_county_spanish",
           "conditions": [
             {
               "friendly_name": "If value less_than 3",
@@ -2446,7 +2446,7 @@
             "value": "{{widgets.gather_county_spanish.SpeechResult}}"
           }
         ],
-        "url": "{{flow.variables.API_BASE_URL}}/validate_county"
+        "url": "{{flow.variables.API_BASE_URL}}/validate_county_spanish"
       }
     },
     {
