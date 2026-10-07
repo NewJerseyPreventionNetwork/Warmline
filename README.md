@@ -4,8 +4,8 @@ This repository contains the code and configuration used to run the NJPN incomin
 
 There are two Twilio Studio Flows:
 
-- `NJPN Main IVR` – used when county routing is available.
-- `NJPN Fallback IVR` – used when county routing is unavailable and calls need to follow the fallback HubSpot/voicemail journey.
+- `Main IVR` – used when county routing is available.
+- `Fallback IVR` – used when county routing is unavailable and calls need to follow the fallback HubSpot/voicemail journey.
 
 The exact caller journeys and behaviour of each flow are documented in [twilio/studio/README.md](twilio/studio/README.md).
 
@@ -18,8 +18,8 @@ If you are setting up or deploying the service, follow these sections in order:
 1. [Understand the repository](#repository-structure)
 2. [Configure HubSpot and Twilio](#configure-hubspot-and-twilio)
 3. [Prepare GitHub Actions](#prepare-github-actions)
-4. [Deploy the Studio Flows](#deploy-the-studio-flows)
-5. [Deploy the Functions Service](#deploy-the-functions-service)
+4. [Deploy the Functions Service](#deploy-the-functions-service)
+5. [Deploy the Studio Flows](#deploy-the-studio-flows)
 6. [Configure the Twilio phone number](#configure-the-twilio-phone-number)
 
 ## Repository structure
@@ -27,8 +27,10 @@ If you are setting up or deploying the service, follow these sections in order:
 ```text
 twilio/
 ├── studio/
-│   ├── main-flow.json
-│   ├── fallback-flow.json
+│   ├── flows/
+│   │   ├── njpn-main-ivr.json
+│   │   └── njpn-fallback-ivr.json
+│   ├── studio-flows.config.json
 │   └── README.md
 └── functions/
     ├── src/
@@ -68,18 +70,19 @@ The following environment variables must be configured on the matching Twilio Fu
 
 Development and Production have separate Functions environments. These values are not automatically created by GitHub Actions.
 
-| Setting | What it is for | Where to get it from |
-| --- | --- | --- |
-| `HUBSPOT_APP_ID` | Identifies the NJPN calling integration in HubSpot. | HubSpot > Development > Projects |
-| `HUBSPOT_CLIENT_ID` | Identifies the HubSpot app when authenticating with HubSpot. | HubSpot project > Auth > Client ID |
-| `HUBSPOT_CLIENT_SECRET` | Private credential used to authenticate with HubSpot. | HubSpot project > Auth > Client Secret |
-| `HUBSPOT_EXTERNAL_ACCOUNT_ID` | Identifies the connected NJPN HubSpot account. | HubSpot account ID |
-| `HUBSPOT_REFRESH_TOKEN` | Allows the integration to obtain HubSpot access tokens. Keep it secret. | HubSpot > Development > Projects > NJPN project > Auth > copy and open the Install URL. Connect the NJPN account and copy the `code` from the redirect URL, then make a POST request to HubSpot's OAuth token endpoint using that code. Use the returned `refresh_token`. |
-| `SHARED_SECRET` | Random secret used internally by the Functions Service to sign and verify temporary recording access tokens. | Generate a strong random secret for this service |
-| `ACCOUNT_SID` | Identifies the Twilio account containing the call recordings. | Twilio Console |
-| `AUTH_TOKEN` | Twilio credential used when retrieving recordings. Keep it secret. | Twilio Console |
-| `AGENT_NUMBERS` | JSON array containing the HubSpot agent phone numbers available for routing. | HubSpot > Settings > Calling > Call Setup > Phone Numbers |
-| `WEBHOOK_URL` | Studio Flow webhook URL used to return agent call results to Studio. | Twilio Studio > required Flow > Flow details |
+| Setting                       | What it is for                                                                                               | Where to get it from                                                                                                                                                                                                                                                      |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `HUBSPOT_APP_ID`              | Identifies the NJPN calling integration in HubSpot.                                                          | HubSpot > Development > Projects                                                                                                                                                                                                                                          |
+| `HUBSPOT_CLIENT_ID`           | Identifies the HubSpot app when authenticating with HubSpot.                                                 | HubSpot project > Auth > Client ID                                                                                                                                                                                                                                        |
+| `HUBSPOT_CLIENT_SECRET`       | Private credential used to authenticate with HubSpot.                                                        | HubSpot project > Auth > Client Secret                                                                                                                                                                                                                                    |
+| `HUBSPOT_EXTERNAL_ACCOUNT_ID` | Identifies the connected NJPN HubSpot account.                                                               | HubSpot account ID                                                                                                                                                                                                                                                        |
+| `HUBSPOT_REFRESH_TOKEN`       | Allows the integration to obtain HubSpot access tokens. Keep it secret.                                      | HubSpot > Development > Projects > NJPN project > Auth > copy and open the Install URL. Connect the NJPN account and copy the `code` from the redirect URL, then make a POST request to HubSpot's OAuth token endpoint using that code. Use the returned `refresh_token`. |
+| `SHARED_SECRET`               | Random secret used internally by the Functions Service to sign and verify temporary recording access tokens. | Generate a strong random secret for this service                                                                                                                                                                                                                          |
+| `ACCOUNT_SID`                 | Identifies the Twilio account containing the call recordings.                                                | Twilio Console                                                                                                                                                                                                                                                            |
+| `AUTH_TOKEN`                  | Twilio credential used when retrieving recordings. Keep it secret.                                           | Twilio Console                                                                                                                                                                                                                                                            |
+| `AGENT_NUMBERS`               | JSON array containing the HubSpot agent phone numbers available for routing.                                 | HubSpot > Settings > Calling > Call Setup > Phone Numbers                                                                                                                                                                                                                 |
+| `WEBHOOK_URL`                 | Studio Flow webhook URL used to return agent call results to Studio.                                         | Twilio Studio > required Flow > Flow details                                                                                                                                                                                                                              |
+| County destination numbers    | One variable per county, such as `ATLANTIC_NUMBER`.                                                          | Set the destination phone numbers in E.164 format. See [Twilio Functions](twilio/functions/README.md#county-routing).                                                                                                                                                     |
 
 Set `AGENT_NUMBERS` as one text value containing a JSON array, for example:
 
@@ -104,12 +107,12 @@ Repository variables and secrets are configured under:
 
 **GitHub repository > Settings > Secrets and variables > Actions**
 
-| GitHub setting | Type | Purpose |
-| --- | --- | --- |
-| `Develop_TWILIO_ACCOUNT_SID` / `Production_TWILIO_ACCOUNT_SID` | Repository variable | Twilio account to deploy to |
-| `Develop_TWILIO_API_KEY` / `Production_TWILIO_API_KEY` | Repository variable | API key used by GitHub Actions |
-| `Develop_TWILIO_API_SECRET` / `Production_TWILIO_API_SECRET` | Repository secret | API secret used by GitHub Actions |
-| `Develop_BASE_URL` / `Production_BASE_URL` | Repository variable | URL of the matching deployed Functions Service |
+| GitHub setting                                                 | Type                | Purpose                                        |
+| -------------------------------------------------------------- | ------------------- | ---------------------------------------------- |
+| `Develop_TWILIO_ACCOUNT_SID` / `Production_TWILIO_ACCOUNT_SID` | Repository variable | Twilio account to deploy to                    |
+| `Develop_TWILIO_API_KEY` / `Production_TWILIO_API_KEY`         | Repository variable | API key used by GitHub Actions                 |
+| `Develop_TWILIO_API_SECRET` / `Production_TWILIO_API_SECRET`   | Repository secret   | API secret used by GitHub Actions              |
+| `Develop_BASE_URL` / `Production_BASE_URL`                     | Repository variable | URL of the matching deployed Functions Service |
 
 Secrets must be stored as GitHub **secrets** and must not be committed to the repository.
 
@@ -183,7 +186,7 @@ If a number has not already been purchased:
 6. Select the Studio Flow that should currently handle incoming NJPN calls.
 7. Save the configuration.
 
-`NJPN Main IVR` should be selected when county routing is available. `NJPN Fallback IVR` can be selected when the county routing journey is unavailable.
+`Main IVR` should be selected when county routing is available. `Fallback IVR` can be selected when the county routing journey is unavailable.
 
 The phone number determines which Studio Flow is live. Both flows can remain deployed while the incoming number points to the required flow.
 
@@ -194,8 +197,8 @@ Agents should keep the HubSpot calling window open and show themselves as availa
 When an agent receives an NJPN call:
 
 1. Answer the incoming call within **25 seconds**.
-2. Listen to the screening message.
-3. Press **`1` within 5 seconds** to accept the caller.
+2. Listen to the HubSpot screening message.
+3. Press **`1` within 10 seconds** to accept the caller.
 
 A timeout, busy line, unavailable agent, or any response other than `1` causes that agent attempt to be rejected. The Studio Flow then determines whether another agent should be attempted or the caller should continue to voicemail.
 

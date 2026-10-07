@@ -4,12 +4,12 @@ The `studio` directory contains the Twilio Studio Flow definitions used by the N
 
 There are two Studio Flows:
 
-- `NJPN Main IVR` – the primary flow, used when county routing is available.
-- `NJPN Fallback IVR` – the fallback flow, used when county routing is unavailable.
+- `Main IVR` – the primary flow, used when county routing is available.
+- `Fallback IVR` – the fallback flow, used when county routing is unavailable.
 
 Both flows are registered in `studio-flows.config.json`.
 
-## NJPN Main IVR
+## Main IVR
 
 The Main IVR allows callers to be routed based on their selected language and, during opening hours, their county or preferred representative.
 
@@ -31,12 +31,12 @@ During opening hours:
 
 1. The caller selects Spanish.
 2. The caller can say their county or request to leave a voicemail.
-3. If a county is provided, the caller is connected to the relevant county number.
+3. If a county is provided, the caller is connected to its configured county number.
 4. If voicemail is requested, the caller is sent to the Spanish voicemail journey.
 
 Outside opening hours, the caller is sent through the Spanish out-of-hours journey and can leave a voicemail.
 
-## NJPN Fallback IVR
+## Fallback IVR
 
 The Fallback IVR is used when county routing is unavailable. It removes the county routing journey while keeping the service available through HubSpot and voicemail.
 
@@ -62,8 +62,8 @@ The appropriate in-hours or out-of-hours message is played before the caller is 
 Where a flow routes an English caller to HubSpot agents:
 
 1. An agent has 25 seconds to answer the incoming call.
-2. After answering, the agent hears a screening message.
-3. The agent has 5 seconds to press `1` to accept the caller.
+2. The agent hears a screening message asking them to press `1` to accept the call.
+3. The agent has 10 seconds to respond.
 4. If accepted, the caller and agent are connected.
 5. If the attempt is not accepted, the flow can try the next available agent.
 6. If no agent accepts the call, the caller is sent to voicemail.
