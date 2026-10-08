@@ -4,14 +4,14 @@ This directory contains the Twilio Functions shared by the `Main IVR` and `Fallb
 
 ## Call routing
 
-| Function                        | Purpose                                                                               |
-| ------------------------------- | ------------------------------------------------------------------------------------- |
-| `agent-dial.protected.ts`       | Dials a configured agent with a 25-second ring timeout and starts agent screening.    |
-| `agent-screen.ts`               | Prompts the agent to press `1` to accept the call; a brief delay may be needed for HubSpot browser audio to connect, but the checked-in function does not currently add one. |
-| `agent-screen-result.ts`        | Accepts or rejects the agent's screening response.                                    |
-| `agent-result.ts`               | Ends a completed bridge or returns the agent attempt result to Studio.                |
-| `multi-agent-dial.protected.ts` | Selects the next agent from `AGENT_NUMBERS` and returns the remaining list.           |
-| `fallback-message.ts`           | Plays an error message and hangs up.                                                  |
+| Function                        | Purpose                                                                                                          |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `agent-dial.protected.ts`       | Dials a configured agent with a 25-second ring timeout and starts agent screening.                               |
+| `agent-screen.ts`               | Prompts the agent to press `1` to accept the call; a brief delay is needed for HubSpot browser audio to connect. |
+| `agent-screen-result.ts`        | Accepts or rejects the agent's screening response.                                                               |
+| `agent-result.ts`               | Ends a completed bridge or returns the agent attempt result to Studio.                                           |
+| `multi-agent-dial.protected.ts` | Selects the next agent from `AGENT_NUMBERS` and returns the remaining list.                                      |
+| `fallback-message.ts`           | Plays an error message and hangs up.                                                                             |
 
 ## County routing
 
