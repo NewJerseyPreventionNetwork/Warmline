@@ -11,6 +11,7 @@ export const handler = function (
   callback: Callback,
 ) {
   const response = new twiml.VoiceResponse();
+  response.pause({length:5});
 
   const gather = response.gather({
     action: `https://${context.DOMAIN_NAME}/agent-screen-result`,
