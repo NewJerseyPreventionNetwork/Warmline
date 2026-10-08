@@ -182,11 +182,10 @@ If a number has not already been purchased:
 2. Search for a United States local number with **Voice** capability.
 3. Select the required New Jersey number and purchase it.
 4. Open the purchased number under **Phone Numbers → Manage → Active numbers**.
-5. Under the incoming Voice configuration, set **A call comes in** to `Studio Flow`.
-6. Select the Studio Flow that should currently handle incoming NJPN calls.
-7. Save the configuration.
-
-`Main IVR` should be selected when county routing is available. `Fallback IVR` can be selected when the county routing journey is unavailable.
+5. Under the incoming Voice configuration, set **Primary method for handling automatic responses** to `Studio Flow`.
+6. Select the flow that should handle incoming NJPN calls: `Main IVR` when county routing is available, or `Fallback IVR` when it is not.
+7. Set **Backup method for handling automatic responses** to **Use Functions**. Select the `NJPN` Function Service, its `ui` environment, and the `/fallback-message` function path.
+8. Save the configuration.
 
 The phone number determines which Studio Flow is live. Both flows can remain deployed while the incoming number points to the required flow.
 
