@@ -84,7 +84,7 @@
           "x": 39,
           "y": 52
         },
-        "url": "{{flow.variables.API_BASE_URL}}/opening_hours"
+        "url": "https://babied-dingbat-marmalade.ngrok-free.dev/opening_hours"
       }
     },
     {
@@ -1711,7 +1711,7 @@
             "value": "{{flow.variables.remainingAgents}}"
           }
         ],
-        "url": "https://gruffly-reaction-saline.ngrok-free.dev/multi-agent-dial"
+        "url": "{{flow.variables.API_BASE_URL}}/multi-agent-dial"
       }
     },
     {
@@ -2150,7 +2150,7 @@
           {
             "key": "API_BASE_URL",
             "type": "string",
-            "value": "https://gruffly-reaction-saline.ngrok-free.dev"
+            "value": "https://njpn-7517.twil.io"
           }
         ]
       }
