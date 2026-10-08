@@ -8,7 +8,8 @@
       "overrideExistingProject": true
     },
     "start": {
-      "assets": false,
+      "assets": true,
+      "assetsFolder": "dist/assets",
       "functions": true,
       "functionsFolder": "dist/functions"
     }
