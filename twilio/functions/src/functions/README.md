@@ -1,16 +1,27 @@
 ## Functions
 
-The `functions` directory contains the Twilio Serverless Functions used by the current `NJPN IVR no-county` Studio Flow. Each TypeScript file is deployed as a function route based on its filename, without the `.ts` extension.
+This directory contains the Twilio Functions shared by the `Main IVR` and `Fallback IVR`. Function source files are deployed with the service and exposed as routes.
 
 ## Call routing
 
-| Function                 | Purpose                                                                                                |
-| ------------------------ | ------------------------------------------------------------------------------------------------------ |
-| `agent-dial.ts`          | Dials an agent, screens the agent before bridging the caller, and sends the result to `agent-result`.  |
-| `agent-screen.ts`        | Prompts the answering agent to press `1` to accept the caller.                                         |
-| `agent-screen-result.ts` | Accepts or rejects the agent screening response.                                                       |
-| `agent-result.ts`        | Hangs up after a completed bridge or returns control to the Studio Flow when the agent is unavailable. |
-| `multi-agent-dial.ts`    | Selects the next agent from the configured list and returns the remaining agents for retry logic.      |
+| Function                        | Purpose                                                                                                          |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `agent-dial.protected.ts`       | Dials a configured agent with a 25-second ring timeout and starts agent screening.                               |
+| `agent-screen.ts`               | Prompts the agent to press `1` to accept the call; a brief delay is needed for HubSpot browser audio to connect. |
+| `agent-screen-result.ts`        | Accepts or rejects the agent's screening response.                                                               |
+| `agent-result.ts`               | Ends a completed bridge or returns the agent attempt result to Studio.                                           |
+| `multi-agent-dial.protected.ts` | Selects the next agent from `AGENT_NUMBERS` and returns the remaining list.                                      |
+| `fallback-message.ts`           | Plays an error message and hangs up.                                                                             |
+
+## County routing
+
+| Function                               | Purpose                                                                           |
+| -------------------------------------- | --------------------------------------------------------------------------------- |
+| `county_mapping.protected.ts`          | Maps English keypad county codes; `0` maps to the representative choice.          |
+| `county_mapping_spanish.protected.ts`  | Maps Spanish keypad county codes to county names.                                 |
+| `validate_county.protected.ts`         | Validates and normalizes spoken English county names and representative requests. |
+| `validate_county_spanish.protected.ts` | Validates and normalizes spoken Spanish county names, including “Cabo May.”       |
+| `county_number.protected.ts`           | Resolves county names to their configured county destination numbers.             |
 
 ## Opening hours
 
