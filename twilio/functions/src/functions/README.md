@@ -7,7 +7,7 @@ The `functions` directory contains the Twilio Serverless Functions used by the c
 | Function                 | Purpose                                                                                                |
 | ------------------------ | ------------------------------------------------------------------------------------------------------ |
 | `agent-dial.ts`          | Dials an agent, screens the agent before bridging the caller, and sends the result to `agent-result`.  |
-| `agent-screen.ts`        | Prompts the answering agent to press `1` to accept the caller.                                         |
+| `agent-screen.ts`        | Prompts the answering agent to press `1` to accept the caller. Includes a short delay before playing the prompt to allow the HubSpot browser call to connect; without this delay, the audio could begin playing before the agent's browser was ready, causing the prompt to be cut off. |
 | `agent-screen-result.ts` | Accepts or rejects the agent screening response.                                                       |
 | `agent-result.ts`        | Hangs up after a completed bridge or returns control to the Studio Flow when the agent is unavailable. |
 | `multi-agent-dial.ts`    | Selects the next agent from the configured list and returns the remaining agents for retry logic.      |
