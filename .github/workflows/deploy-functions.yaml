@@ -15,7 +15,7 @@ on:
 
       UI_EDITABLE:
         type: boolean
-        default: true
+        default: false
         required: true
 
 permissions:
